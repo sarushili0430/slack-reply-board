@@ -25,3 +25,31 @@ Target spec:
 ### Verification
 
 - [x] Unit Test
+
+## TASK-LOCAL-003 Session-protected daemon health endpoint
+
+Target spec:
+
+- FR-LOCAL-001
+- AC-LOCAL-001-02
+
+### Red
+
+- [x] Add `TEST-LOCAL-INTEGRATION-001`.
+- [x] Confirm no daemon local API runtime can serve authenticated health checks.
+
+### Green
+
+- [x] Add a daemon local API runtime with `GET /health`.
+- [x] Validate health responses through Runtime Schema.
+- [x] Reject unauthorized health requests.
+- [x] Stop the local API runtime cleanly.
+
+### Refactor
+
+- [x] Keep HTTP wiring in daemon local-api and health payload creation in health code.
+
+### Verification
+
+- [x] Integration Test
+- [x] Quality

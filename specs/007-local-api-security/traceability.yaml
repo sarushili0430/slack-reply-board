@@ -2,13 +2,22 @@ requirement: FR-LOCAL-001
 
 acceptanceCriteria:
   - AC-LOCAL-001-01
+  - AC-LOCAL-001-02
 
 tasks:
   - TASK-LOCAL-001
+  - TASK-LOCAL-003
 
 tests:
   - TEST-LOCAL-UNIT-001
+  - TEST-LOCAL-INTEGRATION-001
+  - TEST-LOCAL-INTEGRATION-002
+  - TEST-LOCAL-INTEGRATION-003
 
 implementation:
   - apps/daemon/src/local-api/session-token.ts
+  - apps/daemon/src/local-api/local-api-server.ts
+  - apps/daemon/src/bootstrap/start-daemon.ts
+  - apps/desktop/src/main/daemon-supervisor/daemon-health-client.ts
   - packages/contracts/src/local-api/auth.ts
+  - packages/contracts/src/local-api/health.ts
