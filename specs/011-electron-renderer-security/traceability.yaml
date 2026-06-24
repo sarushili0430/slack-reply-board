@@ -1,0 +1,13 @@
+requirement: FR-ELECTRON-001
+
+acceptanceCriteria:
+  - AC-ELECTRON-001-01
+
+tasks:
+  - TASK-ELECTRON-001
+
+tests:
+  - TEST-ELECTRON-UNIT-001
+
+implementation:
+  - apps/desktop/src/main/windows/create-main-window.ts
