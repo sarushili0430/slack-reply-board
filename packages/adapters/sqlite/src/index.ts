@@ -2,7 +2,12 @@ import Database from 'better-sqlite3';
 import { mkdirSync } from 'node:fs';
 import { dirname } from 'node:path';
 
-import type { MessageRepository, SlackEventId, SyncedSlackMessage } from '@replyboard/slack-sync';
+import {
+  createSlackEventId,
+  type MessageRepository,
+  type SlackEventId,
+  type SyncedSlackMessage,
+} from '@replyboard/slack-sync';
 
 export type SqliteMessageRepositoryOptions = {
   readonly databasePath: string;
@@ -25,6 +30,14 @@ export type SqliteOutboxEvent = {
 
 type EventIdRow = {
   readonly event_id: string;
+};
+
+type StoredMessageRow = {
+  readonly event_id: string;
+  readonly workspace_id: string;
+  readonly channel_id: string;
+  readonly message_ts: string;
+  readonly text: string;
 };
 
 type InsertMessageParams = {
@@ -172,6 +185,31 @@ export class SqliteMessageRepository implements MessageRepository {
     });
 
     return Promise.resolve(saveMessage(message));
+  }
+
+  findMessageByEventId(eventId: string): Promise<SyncedSlackMessage | null> {
+    const row = this.#database
+      .prepare<[string], StoredMessageRow>(
+        `
+        select event_id, workspace_id, channel_id, message_ts, text
+        from slack_messages
+        where event_id = ?
+        limit 1
+      `,
+      )
+      .get(eventId);
+
+    if (row === undefined) {
+      return Promise.resolve(null);
+    }
+
+    return Promise.resolve({
+      eventId: createSlackEventId(row.event_id),
+      workspaceId: row.workspace_id,
+      channelId: row.channel_id,
+      messageTs: row.message_ts,
+      text: row.text,
+    });
   }
 
   close(): void {

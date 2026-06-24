@@ -149,6 +149,9 @@ importers:
       '@replyboard/knowledge':
         specifier: workspace:*
         version: link:../../packages/knowledge
+      '@replyboard/slack-sync':
+        specifier: workspace:*
+        version: link:../../packages/slack-sync
 
   packages/adapters/filesystem: {}
 

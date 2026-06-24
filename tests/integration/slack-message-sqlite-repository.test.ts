@@ -38,6 +38,7 @@ describe('FR-SYNC-001 Slack履歴の差分同期', () => {
       await repository.saveMessage(createMessage('Ev-integration-1', 'first body'));
       await repository.saveMessage(createMessage('Ev-integration-1', 'duplicate body'));
 
+      const storedMessage = await repository.findMessageByEventId('Ev-integration-1');
       const database = new Database(databasePath, {
         fileMustExist: true,
         readonly: true,
@@ -54,6 +55,7 @@ describe('FR-SYNC-001 Slack履歴の差分同期', () => {
 
         expect(journalMode).toBe('wal');
         expect(rows).toEqual([{ event_id: 'Ev-integration-1', text: 'first body' }]);
+        expect(storedMessage).toEqual(createMessage('Ev-integration-1', 'first body'));
       } finally {
         database.close();
       }

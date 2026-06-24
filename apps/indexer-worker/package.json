@@ -16,6 +16,7 @@
     "test:coverage": "vitest run --coverage --passWithNoTests"
   },
   "dependencies": {
-    "@replyboard/knowledge": "workspace:*"
+    "@replyboard/knowledge": "workspace:*",
+    "@replyboard/slack-sync": "workspace:*"
   }
 }

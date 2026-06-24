@@ -12,6 +12,7 @@ tasks:
   - TASK-SYNC-005
   - TASK-SYNC-006
   - TASK-SYNC-007
+  - TASK-SYNC-008
 
 tests:
   - TEST-SYNC-UNIT-001
@@ -22,9 +23,11 @@ tests:
   - TEST-SYNC-INTEGRATION-002
   - TEST-SYNC-INTEGRATION-003
   - TEST-SYNC-UNIT-003
+  - TEST-SYNC-UNIT-004
   - TEST-SYNC-ACCEPTANCE-001
 
 implementation:
+  - apps/indexer-worker/src/consumers/process-indexing-outbox.ts
   - packages/adapters/slack/src/index.ts
   - packages/adapters/sqlite/src/index.ts
   - packages/slack-sync/src/domain/slack-event-id.ts

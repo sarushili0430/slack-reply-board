@@ -186,3 +186,33 @@ Target spec:
 ### Verification
 
 - [x] SQLite Integration Test
+
+## TASK-SYNC-008 Indexer outbox consumer
+
+Target spec:
+
+- FR-SYNC-001
+- AC-SYNC-001-02
+- NFR-SYNC-004
+
+### Red
+
+- [x] Add `TEST-SYNC-UNIT-004`.
+- [x] Confirm indexer-worker has no outbox consumer.
+
+### Green
+
+- [x] Claim pending indexing outbox events.
+- [x] Read the Raw Message by Slack `event_id`.
+- [x] Send the message to Keyword and Vector indexes with the outbox idempotency key.
+- [x] Mark the outbox event processed only after both indexes succeed.
+
+### Refactor
+
+- [x] Keep worker orchestration in `apps/indexer-worker`.
+- [x] Keep storage details behind ports.
+
+### Verification
+
+- [x] Unit Test
+- [x] SQLite Integration Test
