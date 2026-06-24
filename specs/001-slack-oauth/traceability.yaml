@@ -5,9 +5,11 @@ acceptanceCriteria:
 
 tasks:
   - TASK-OAUTH-001
+  - TASK-OAUTH-002
 
 tests:
   - TEST-OAUTH-UNIT-001
+  - TEST-OAUTH-UNIT-002
 
 implementation:
   - packages/adapters/keychain/src/index.ts
