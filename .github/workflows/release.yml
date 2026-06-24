@@ -68,38 +68,22 @@ jobs:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-        run: pnpm --filter @replyboard/desktop package
-
-      - name: Normalize package output
-        run: |
-          if [ ! -d out/desktop ] || [ -z "$(find out/desktop -mindepth 1 -maxdepth 1 -print -quit)" ]; then
-            search_root="$(dirname "${RUNNER_WORKSPACE:-$PWD}")"
-            package_file="$(
-              find "$search_root" -maxdepth 12 -type f -path '*/out/*' -name 'LICENSES.chromium.html' -print -quit
-            )"
-            if [ -z "$package_file" ]; then
-              find "$search_root" -maxdepth 10 -type d -print
-              exit 1
-            fi
-            package_dir="$(dirname "$package_file")"
-            mkdir -p out/desktop
-            cp -R "$package_dir" out/desktop/
-          fi
-          find out/desktop -maxdepth 3 -print
+        working-directory: apps/desktop
+        run: pnpm exec electron-forge package
 
       - name: Generate checksums
         run: >
-          find out/desktop -maxdepth 3 -type f -print0 |
-          xargs -0 shasum -a 256 > out/desktop/SHA256SUMS.sha256
+          find apps/desktop/out -maxdepth 3 -type f -print0 |
+          xargs -0 shasum -a 256 > apps/desktop/out/SHA256SUMS.sha256
 
       - name: Attest artifacts
         uses: actions/attest-build-provenance@e8998f949152b193b063cb0ec769d69d929409be # v2.4.0
         with:
-          subject-path: out/desktop/**
+          subject-path: apps/desktop/out/**
 
       - name: Upload artifact
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: slack-reply-board-release-macos
-          path: out/desktop
+          path: apps/desktop/out
           if-no-files-found: error
