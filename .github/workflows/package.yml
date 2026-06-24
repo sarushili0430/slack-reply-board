@@ -34,6 +34,16 @@ jobs:
       - name: Package Electron app
         run: pnpm --filter @replyboard/desktop package
 
+      - name: Normalize package output
+        run: |
+          if [ -z "$(find out/desktop -mindepth 1 -maxdepth 1 -print -quit 2>/dev/null)" ]; then
+            package_dir="$(find "$RUNNER_WORKSPACE" -maxdepth 8 -type d -name '@replyboard-desktop-*' -print -quit)"
+            test -n "$package_dir"
+            mkdir -p out/desktop
+            cp -R "$package_dir" out/desktop/
+          fi
+          find out/desktop -maxdepth 3 -print
+
       - name: Upload artifact
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
