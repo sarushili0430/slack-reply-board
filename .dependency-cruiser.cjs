@@ -10,42 +10,53 @@ module.exports = {
       },
     },
     {
-      name: 'no-deep-replyboard-imports',
+      name: 'not-to-unresolvable',
       severity: 'error',
+      comment: 'Imports must resolve to a concrete module.',
       from: {},
       to: {
-        path: '^@replyboard/.+/src/',
+        couldNotResolve: true,
       },
     },
     {
-      name: 'renderer-no-node-or-electron',
+      name: 'renderer-not-to-node-electron-or-data-apis',
       severity: 'error',
       from: {
         path: '^apps/desktop/src/renderer/',
       },
       to: {
-        path: '^(node:|fs$|path$|child_process$|electron$|better-sqlite3$)',
+        path: '^(node:|fs$|path$|child_process$|electron$|better-sqlite3$|@slack/|packages/adapters/)',
       },
     },
     {
-      name: 'domain-no-adapters',
+      name: 'domain-not-to-adapters-or-technology-sdks',
       severity: 'error',
       from: {
-        path: '^packages/[^/]+/src/domain/',
+        path: '^packages/(?!adapters/)[^/]+/src/domain/',
       },
       to: {
-        path: '^(packages/adapters/|@replyboard/adapters|@slack/|electron$|better-sqlite3$)',
+        path: '^(packages/adapters/|@replyboard/adapters|@slack/|@modelcontextprotocol/|electron$|better-sqlite3$)',
       },
     },
     {
-      name: 'adapters-no-adapter-to-adapter',
+      name: 'mcp-tools-not-to-direct-data-apis',
       severity: 'error',
       from: {
-        path: '^packages/adapters/[^/]+/',
+        path: '^apps/hermes-mcp/src/tools/',
+      },
+      to: {
+        path: '^(packages/adapters/(sqlite|slack|vector-store)/|better-sqlite3$|@slack/)',
+      },
+    },
+    {
+      name: 'adapter-not-to-other-adapter',
+      severity: 'error',
+      from: {
+        path: '^packages/adapters/([^/]+)/',
       },
       to: {
         path: '^packages/adapters/[^/]+/',
-        pathNot: '^packages/adapters/([^/]+)/',
+        pathNot: '^packages/adapters/$1/',
       },
     },
     {

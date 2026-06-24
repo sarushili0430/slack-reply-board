@@ -23,7 +23,7 @@
     "test:acceptance": "vitest run --project acceptance --passWithNoTests",
     "test:e2e": "playwright test",
     "build": "pnpm -r --if-present build",
-    "architecture:check": "dependency-cruiser apps packages",
+    "architecture:check": "dependency-cruiser --config .dependency-cruiser.cjs apps packages",
     "spec:lint": "node scripts/check-specs.mjs",
     "spec:traceability": "node scripts/check-traceability.mjs",
     "release:verify": "node scripts/verify-release.mjs",
