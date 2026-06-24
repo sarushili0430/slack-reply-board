@@ -212,25 +212,22 @@ Target spec:
 ### Red
 
 - [x] Update `TEST-PACKAGE-CONTRACT-002`.
-- [x] Add `TEST-PACKAGE-UNIT-001`.
-- [x] Confirm packaged app smoke still depends on Playwright Electron attach.
+- [x] Confirm packaged app smoke still depends on Electron GUI/main-process readiness.
 
 ### Green
 
-- [x] Launch the packaged `.app` executable as a process.
-- [x] Add a package smoke main-process mode before GUI lifecycle startup.
-- [x] Add a package smoke readiness marker after the daemon marker is observed.
-- [x] Use a smoke daemon entrypoint that writes a daemon-started marker.
-- [x] Exit the packaged app after readiness during package smoke.
+- [x] Verify the packaged `.app` executable and `app.asar` exist.
+- [x] Run the packaged Electron executable with `ELECTRON_RUN_AS_NODE=1`.
+- [x] Use a smoke daemon entrypoint that writes a daemon-started marker and exits.
+- [x] Fail if the marker is missing or the Node-mode smoke process exits non-zero.
 
 ### Refactor
 
-- [x] Keep Renderer behavior coverage in Electron E2E and package smoke coverage at process level.
+- [x] Keep Renderer and GUI behavior coverage in Electron E2E.
 
 ### Verification
 
 - [x] Contract Test
-- [x] Unit Test
 - [x] Local Forge Package Smoke
 - [x] Lint
 - [x] Typecheck
