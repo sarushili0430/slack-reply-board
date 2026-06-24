@@ -15,7 +15,8 @@ describe('FR-PACKAGE-001 Electron Forge packaging', () => {
     ]);
     const workflowText = `${packageWorkflow}\n${releaseWorkflow}`;
 
-    expect(workflowText).toContain('pnpm --filter @replyboard/desktop package');
+    expect(workflowText).toContain('pnpm --filter @replyboard/desktop exec electron-forge package');
+    expect(workflowText).not.toContain('package -- --platform=darwin');
     expect(workflowText).not.toContain('electron-packager');
 
     expect(forgeConfig).toContain("name: 'SlackReplyBoard'");
@@ -50,10 +51,10 @@ describe('FR-PACKAGE-001 Electron Forge packaging', () => {
     ]);
 
     expect(packageWorkflow).toContain(
-      'pnpm --filter @replyboard/desktop package -- --platform=darwin --arch=arm64 --out=out',
+      'pnpm --filter @replyboard/desktop exec electron-forge package --platform=darwin --arch=arm64 -- --out=out',
     );
     expect(releaseWorkflow).toContain(
-      'pnpm --filter @replyboard/desktop package -- --platform=darwin --arch=arm64,x64 --out=out',
+      'pnpm --filter @replyboard/desktop exec electron-forge package --platform=darwin --arch=arm64,x64 -- --out=out',
     );
     expect(packageWorkflow).toContain('apps/desktop/out');
     expect(releaseWorkflow).toContain('apps/desktop/out');

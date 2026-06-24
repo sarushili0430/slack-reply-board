@@ -118,7 +118,7 @@ jobs:
           APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
-          pnpm --filter @replyboard/desktop package -- --platform=darwin --arch=arm64,x64 --out=out
+          pnpm --filter @replyboard/desktop exec electron-forge package --platform=darwin --arch=arm64,x64 -- --out=out
           for attempt in $(seq 1 90); do
             if [ -d apps/desktop/out ] && [ -n "$(find apps/desktop/out -mindepth 1 -maxdepth 1 -print -quit)" ]; then
               find apps/desktop/out -maxdepth 3 -print

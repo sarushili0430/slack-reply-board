@@ -19,7 +19,7 @@ When:
 
 Then:
 
-- Packaging is invoked through `@replyboard/desktop`'s Electron Forge package script.
+- Packaging is invoked through the `@replyboard/desktop` workspace's Electron Forge CLI.
 - Workflows do not call `electron-packager` directly.
 - macOS bundle ID, signing, hardened runtime, entitlements, and notarization are configured in
   `apps/desktop/forge.config.ts`.
@@ -58,6 +58,22 @@ Then:
 - Both workflows wait for and smoke test `apps/desktop/out`.
 - A successful Forge command cannot be treated as a successful package workflow unless
   `apps/desktop/out` exists and contains at least one packaged artifact.
+
+### AC-PACKAGE-001-04 Package workflows pass Forge arguments directly
+
+Given:
+
+- Package and release workflows invoke Electron Forge through pnpm.
+
+When:
+
+- Platform, architecture, and output arguments are passed to Forge.
+
+Then:
+
+- Workflows use `pnpm --filter @replyboard/desktop exec electron-forge package`.
+- Workflows pass `--platform` and `--arch` directly to Forge.
+- Workflows pass packager-only `--out=out` after Forge's `--` argument separator.
 
 ## Security Impact
 
