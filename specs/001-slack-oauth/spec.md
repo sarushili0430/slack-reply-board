@@ -38,3 +38,20 @@ Then:
 - The access token is stored through the Slack token store port.
 - The response contains only `workspaceIdHash` and `keychainAccount`.
 - The response does not contain the raw Slack access token.
+
+### AC-OAUTH-001-03 Slack OAuth code exchange maps to daemon completion input
+
+Given:
+
+- Slack redirects back with an OAuth authorization code.
+
+When:
+
+- The Slack adapter exchanges the code with Slack `oauth.v2.access`.
+
+Then:
+
+- The adapter sends `client_id`, `client_secret`, `code`, and optional `redirect_uri` as form data.
+- The Slack response is validated with Runtime Schema.
+- A successful response is mapped to `workspaceId` and `accessToken` for daemon OAuth completion.
+- A failed Slack response is rejected without returning a token reference.
