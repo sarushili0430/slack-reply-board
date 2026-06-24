@@ -36,9 +36,12 @@ jobs:
 
       - name: Normalize package output
         run: |
-          if [ -z "$(find out/desktop -mindepth 1 -maxdepth 1 -print -quit 2>/dev/null)" ]; then
+          if [ ! -d out/desktop ] || [ -z "$(find out/desktop -mindepth 1 -maxdepth 1 -print -quit)" ]; then
             package_dir="$(find "$RUNNER_WORKSPACE" -maxdepth 8 -type d -name '@replyboard-desktop-*' -print -quit)"
-            test -n "$package_dir"
+            if [ -z "$package_dir" ]; then
+              find "$RUNNER_WORKSPACE" -maxdepth 8 -type d -print
+              exit 1
+            fi
             mkdir -p out/desktop
             cp -R "$package_dir" out/desktop/
           fi
