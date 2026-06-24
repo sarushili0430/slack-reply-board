@@ -37,9 +37,10 @@ When:
 Then:
 
 - Automation launches the packaged `.app` executable as a macOS process.
-- The packaged app starts the supervised daemon with a smoke daemon entrypoint.
-- The packaged app writes a package-smoke readiness marker after Electron lifecycle startup
-  finishes.
+- The packaged app starts a package-smoke main-process mode without waiting for a GUI window.
+- The smoke main process starts the supervised daemon with a smoke daemon entrypoint.
+- The smoke main process writes a package-smoke readiness marker after the daemon marker is
+  observed.
 - The smoke exits the application cleanly before artifact upload or release publication.
 - Renderer behavior remains covered by Electron E2E, not by the packaged app smoke attach path.
 

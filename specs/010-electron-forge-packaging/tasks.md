@@ -218,9 +218,10 @@ Target spec:
 ### Green
 
 - [x] Launch the packaged `.app` executable as a process.
-- [x] Add a package smoke readiness marker after Electron lifecycle startup.
+- [x] Add a package smoke main-process mode before GUI lifecycle startup.
+- [x] Add a package smoke readiness marker after the daemon marker is observed.
 - [x] Use a smoke daemon entrypoint that writes a daemon-started marker.
-- [x] Quit the packaged app after readiness during package smoke.
+- [x] Exit the packaged app after readiness during package smoke.
 
 ### Refactor
 
