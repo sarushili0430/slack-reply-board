@@ -29,6 +29,7 @@ const releaseWorkflowRequirements = [
   'KEYCHAIN_PASSWORD',
   'security import',
   'shasum -a 256',
+  'node scripts/generate-sbom.mjs apps/desktop/out/sbom.spdx.json',
   'actions/attest-build-provenance',
   'actions/upload-artifact',
   'softprops/action-gh-release',
@@ -78,6 +79,7 @@ if (errors.length > 0) {
 const artifactDirectory = process.argv[2] ?? 'out';
 const files = await readdir(artifactDirectory).catch(() => []);
 const checksum = files.find((file) => file.endsWith('.sha256'));
+const sbom = files.find((file) => file === 'sbom.spdx.json');
 
 if (files.length > 0) {
   if (checksum === undefined) {
@@ -85,6 +87,13 @@ if (files.length > 0) {
     process.exit(1);
   }
 
+  if (sbom === undefined) {
+    console.error(`No SBOM found in ${artifactDirectory}`);
+    process.exit(1);
+  }
+
   await access(join(artifactDirectory, checksum));
+  await access(join(artifactDirectory, sbom));
   console.log(`Release artifact checksum present: ${checksum}`);
+  console.log(`Release artifact SBOM present: ${sbom}`);
 }
