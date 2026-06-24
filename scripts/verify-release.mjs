@@ -55,6 +55,13 @@ if (
   errors.push('package and release workflows must smoke test the packaged macOS app');
 }
 
+if (
+  !packageWorkflowText.includes('pnpm gitflow:check') ||
+  !workflowText.includes('pnpm gitflow:check')
+) {
+  errors.push('package and release workflows must check Git flow refs');
+}
+
 if (packagingWorkflowText.includes('electron-packager')) {
   errors.push('package and release workflows must not call electron-packager directly');
 }

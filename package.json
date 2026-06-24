@@ -26,6 +26,7 @@
     "architecture:check": "dependency-cruiser --config .dependency-cruiser.cjs apps packages",
     "spec:lint": "node scripts/check-specs.mjs",
     "spec:traceability": "node scripts/check-traceability.mjs",
+    "gitflow:check": "node scripts/check-git-flow-ref.mjs",
     "release:verify": "node scripts/verify-release.mjs",
     "package:smoke": "node scripts/smoke-macos-app.mjs",
     "security:licenses": "node scripts/check-license-policy.mjs",
@@ -34,7 +35,7 @@
     "eval:drafting": "node scripts/check-evals.mjs drafting",
     "eval:grounding": "node scripts/check-evals.mjs grounding",
     "eval": "pnpm eval:retrieval && pnpm eval:classification && pnpm eval:drafting && pnpm eval:grounding",
-    "quality:fast": "pnpm spec:lint && pnpm spec:traceability && pnpm release:verify && pnpm format:check && pnpm lint && pnpm typecheck",
+    "quality:fast": "pnpm spec:lint && pnpm spec:traceability && pnpm gitflow:check && pnpm release:verify && pnpm format:check && pnpm lint && pnpm typecheck",
     "quality": "pnpm quality:fast && pnpm test:unit && pnpm test:contract && pnpm test:integration && pnpm test:acceptance && pnpm eval && pnpm architecture:check && pnpm build"
   },
   "devDependencies": {
