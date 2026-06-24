@@ -12,6 +12,12 @@ type StoredMessageRow = {
   readonly text: string;
 };
 
+type OutboxEventRow = {
+  readonly event_id: string;
+  readonly event_type: string;
+  readonly payload_json: string;
+};
+
 function createMessage(eventId: string, text: string): SyncedSlackMessage {
   return {
     eventId: createSlackEventId(eventId),
@@ -48,6 +54,51 @@ describe('FR-SYNC-001 Slack履歴の差分同期', () => {
 
         expect(journalMode).toBe('wal');
         expect(rows).toEqual([{ event_id: 'Ev-integration-1', text: 'first body' }]);
+      } finally {
+        database.close();
+      }
+    } finally {
+      repository.close();
+      await rm(temporaryDirectory, { recursive: true, force: true });
+    }
+  });
+
+  test('TEST-SYNC-INTEGRATION-002 / NFR-SYNC-003: SQLite Raw Message Storeはindexing outboxを同一保存境界で一度だけ投入する', async () => {
+    const temporaryDirectory = await mkdtemp(join(tmpdir(), 'replyboard-sqlite-'));
+    const databasePath = join(temporaryDirectory, 'messages.sqlite');
+    const repository = new SqliteMessageRepository({ databasePath });
+
+    try {
+      await repository.saveMessage(createMessage('Ev-integration-2', 'outbox body'));
+      await repository.saveMessage(createMessage('Ev-integration-2', 'duplicate outbox body'));
+
+      const database = new Database(databasePath, {
+        fileMustExist: true,
+        readonly: true,
+      });
+
+      try {
+        const rows = database
+          .prepare<[string], OutboxEventRow>(
+            `
+            select event_id, event_type, payload_json
+            from outbox_events
+            where event_id = ?
+          `,
+          )
+          .all('Ev-integration-2');
+
+        expect(rows).toHaveLength(1);
+        expect(rows[0]).toEqual({
+          event_id: 'Ev-integration-2',
+          event_type: 'slack_message.index_requested',
+          payload_json: JSON.stringify({
+            eventId: 'Ev-integration-2',
+            workspaceId: 'T-integration',
+            channelId: 'C-integration',
+            messageTs: '1710000000.000500',
+          }),
+        });
       } finally {
         database.close();
       }

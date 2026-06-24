@@ -20,6 +20,13 @@ type InsertMessageParams = {
   readonly text: string;
 };
 
+type InsertOutboxEventParams = {
+  readonly id: string;
+  readonly eventId: SlackEventId;
+  readonly eventType: string;
+  readonly payloadJson: string;
+};
+
 export class SqliteMessageRepository implements MessageRepository {
   readonly #database: ReturnType<typeof Database>;
 
@@ -38,6 +45,16 @@ export class SqliteMessageRepository implements MessageRepository {
         created_at text not null default (strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))
       )
     `);
+    this.#database.exec(`
+      create table if not exists outbox_events (
+        id text primary key,
+        event_id text not null unique,
+        event_type text not null,
+        payload_json text not null,
+        created_at text not null default (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
+        processed_at text
+      )
+    `);
   }
 
   hasEventId(eventId: SlackEventId): Promise<boolean> {
@@ -52,9 +69,7 @@ export class SqliteMessageRepository implements MessageRepository {
   }
 
   saveMessage(message: SyncedSlackMessage): Promise<boolean> {
-    const result = this.#database
-      .prepare<InsertMessageParams>(
-        `
+    const insertMessage = this.#database.prepare<InsertMessageParams>(`
         insert or ignore into slack_messages (
           event_id,
           workspace_id,
@@ -68,11 +83,43 @@ export class SqliteMessageRepository implements MessageRepository {
           @messageTs,
           @text
         )
-      `,
-      )
-      .run(message);
+      `);
+    const insertOutboxEvent = this.#database.prepare<InsertOutboxEventParams>(`
+        insert into outbox_events (
+          id,
+          event_id,
+          event_type,
+          payload_json
+        ) values (
+          @id,
+          @eventId,
+          @eventType,
+          @payloadJson
+        )
+      `);
+    const saveMessage = this.#database.transaction((messageToSave: SyncedSlackMessage) => {
+      const result = insertMessage.run(messageToSave);
 
-    return Promise.resolve(result.changes > 0);
+      if (result.changes === 0) {
+        return false;
+      }
+
+      insertOutboxEvent.run({
+        id: `slack-message-index:${messageToSave.eventId}`,
+        eventId: messageToSave.eventId,
+        eventType: 'slack_message.index_requested',
+        payloadJson: JSON.stringify({
+          eventId: messageToSave.eventId,
+          workspaceId: messageToSave.workspaceId,
+          channelId: messageToSave.channelId,
+          messageTs: messageToSave.messageTs,
+        }),
+      });
+
+      return true;
+    });
+
+    return Promise.resolve(saveMessage(message));
   }
 
   close(): void {

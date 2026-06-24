@@ -132,3 +132,30 @@ Target spec:
 
 - [x] Unit Test
 - [x] SQLite Integration Test
+
+## TASK-SYNC-006 SQLite indexing outbox
+
+Target spec:
+
+- FR-SYNC-001
+- AC-SYNC-001-02
+- NFR-SYNC-003
+
+### Red
+
+- [x] Add `TEST-SYNC-INTEGRATION-002`.
+- [x] Confirm SQLite Raw Message Store does not create an indexing outbox entry.
+
+### Green
+
+- [x] Create the SQLite outbox table.
+- [x] Insert the Raw Message row and indexing outbox row in one transaction.
+- [x] Avoid duplicate outbox rows when the same `event_id` is saved twice.
+
+### Refactor
+
+- [x] Keep outbox schema and payload shape inside the SQLite adapter.
+
+### Verification
+
+- [x] SQLite Integration Test

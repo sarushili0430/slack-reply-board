@@ -52,6 +52,11 @@ Slack events must be reflected to cards within p95 10 seconds, excluding Slack A
 
 New messages must become searchable within p95 30 seconds after event receipt.
 
+### NFR-SYNC-003 Atomic raw storage and indexing enqueue
+
+Persisting a new Slack message and enqueueing the indexing job must happen in the same SQLite
+transaction or through an outbox table protected by the same write boundary.
+
 ## Security Impact
 
 - Slack tokens must stay behind the Slack adapter and Keychain adapter.
