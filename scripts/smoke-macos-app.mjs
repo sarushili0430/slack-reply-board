@@ -8,24 +8,20 @@ const defaultOutDirectory = join('apps', 'desktop', 'out');
 const outDirectory = process.argv[2] ?? process.env.REPLYBOARD_MACOS_OUT_DIR ?? defaultOutDirectory;
 const appPath = process.env.REPLYBOARD_MACOS_APP_PATH ?? (await findMacosApp(outDirectory));
 const appExecutablePath = join(appPath, 'Contents', 'MacOS', 'SlackReplyBoard');
+const appAsarPath = join(appPath, 'Contents', 'Resources', 'app.asar');
 const smokeDirectory = await mkdtemp(join(tmpdir(), 'replyboard-package-smoke-'));
-const appReadyFilePath = join(smokeDirectory, 'app-ready.json');
 const daemonReadyFilePath = join(smokeDirectory, 'daemon-ready.json');
 const smokeDaemonEntryPath = await createSmokeDaemonEntry(smokeDirectory);
 const timeoutMs = readTimeoutMs();
 
-await access(appExecutablePath);
+await Promise.all([access(appExecutablePath), access(appAsarPath)]);
 
 const output = [];
-const child = spawn(appExecutablePath, [], {
+const child = spawn(appExecutablePath, [smokeDaemonEntryPath], {
   env: {
     ...process.env,
-    REPLYBOARD_DAEMON_ENTRY_PATH: smokeDaemonEntryPath,
-    REPLYBOARD_E2E: '1',
+    ELECTRON_RUN_AS_NODE: '1',
     REPLYBOARD_PACKAGE_SMOKE_DAEMON_READY_FILE: daemonReadyFilePath,
-    REPLYBOARD_PACKAGE_SMOKE_QUIT_AFTER_READY: '1',
-    REPLYBOARD_PACKAGE_SMOKE_MAIN_PROCESS: '1',
-    REPLYBOARD_PACKAGE_SMOKE_READY_FILE: appReadyFilePath,
   },
   stdio: ['ignore', 'pipe', 'pipe'],
 });
@@ -46,8 +42,7 @@ const childExitPromise = new Promise((resolve) => {
 });
 
 try {
-  await waitForPackageSmokeMarkers({
-    appReadyFilePath,
+  await waitForDaemonSmokeMarker({
     daemonReadyFilePath,
     getChildExit: () => childExit,
     timeoutMs,
@@ -56,7 +51,9 @@ try {
 
   if (exit.code !== 0) {
     throw new Error(
-      `Packaged app exited with code ${String(exit.code)} and signal ${exit.signal}.`,
+      `Packaged Electron Node-mode smoke exited with code ${String(exit.code)} and signal ${
+        exit.signal
+      }.`,
     );
   }
 
@@ -116,16 +113,13 @@ function shouldSkipDirectory(name) {
   return name === 'node_modules' || name === '.git' || name === 'dSYMs';
 }
 
-async function waitForPackageSmokeMarkers(options) {
+async function waitForDaemonSmokeMarker(options) {
   const deadline = Date.now() + options.timeoutMs;
 
   while (Date.now() < deadline) {
-    const [appReady, daemonReady] = await Promise.all([
-      readJsonMarker(options.appReadyFilePath),
-      readJsonMarker(options.daemonReadyFilePath),
-    ]);
+    const daemonReady = await readJsonMarker(options.daemonReadyFilePath);
 
-    if (appReady?.ready === true && daemonReady?.ready === true) {
+    if (daemonReady?.ready === true) {
       return;
     }
 
@@ -133,17 +127,17 @@ async function waitForPackageSmokeMarkers(options) {
 
     if (childExit !== undefined) {
       throw new Error(
-        `Packaged app exited before smoke markers were written: code ${String(
+        `Packaged Electron Node-mode smoke exited before marker was written: code ${String(
           childExit.code,
         )}, signal ${childExit.signal}.`,
       );
     }
 
-    await delay(250);
+    await delay(100);
   }
 
   throw new Error(
-    `Timed out after ${String(options.timeoutMs)}ms waiting for package smoke markers.`,
+    `Timed out after ${String(options.timeoutMs)}ms waiting for package smoke marker.`,
   );
 }
 
@@ -161,7 +155,9 @@ async function waitForProcessExit(exitPromise, timeoutMs) {
 
   if (exit === undefined) {
     throw new Error(
-      `Packaged app did not exit within ${String(timeoutMs)}ms after smoke readiness.`,
+      `Packaged Electron Node-mode smoke did not exit within ${String(
+        timeoutMs,
+      )}ms after readiness.`,
     );
   }
 
@@ -193,19 +189,10 @@ async function createSmokeDaemonEntry(directory) {
       "import { writeFileSync } from 'node:fs';",
       '',
       'const readyFilePath = process.env.REPLYBOARD_PACKAGE_SMOKE_DAEMON_READY_FILE;',
-      'if (readyFilePath !== undefined && readyFilePath.length > 0) {',
-      '  writeFileSync(readyFilePath, `${JSON.stringify({ ready: true, pid: process.pid })}\\n`);',
+      'if (readyFilePath === undefined || readyFilePath.length === 0) {',
+      "  throw new Error('REPLYBOARD_PACKAGE_SMOKE_DAEMON_READY_FILE must be set.');",
       '}',
-      '',
-      'const keepAlive = setInterval(() => undefined, 60_000);',
-      "process.once('SIGTERM', () => {",
-      '  clearInterval(keepAlive);',
-      '  process.exit(0);',
-      '});',
-      "process.once('SIGINT', () => {",
-      '  clearInterval(keepAlive);',
-      '  process.exit(0);',
-      '});',
+      'writeFileSync(readyFilePath, `${JSON.stringify({ ready: true, pid: process.pid })}\\n`);',
       '',
     ].join('\n'),
   );
