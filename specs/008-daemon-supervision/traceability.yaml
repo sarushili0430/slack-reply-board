@@ -5,9 +5,12 @@ acceptanceCriteria:
 
 tasks:
   - TASK-DAEMON-001
+  - TASK-DAEMON-002
 
 tests:
   - TEST-DAEMON-UNIT-001
+  - TEST-DAEMON-UNIT-002
 
 implementation:
+  - apps/desktop/src/main/daemon-supervisor/daemon-supervisor.ts
   - apps/desktop/src/main/daemon-supervisor/restart-policy.ts

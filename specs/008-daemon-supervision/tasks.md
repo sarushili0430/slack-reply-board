@@ -26,3 +26,30 @@ Target spec:
 ### Verification
 
 - [x] Unit Test
+
+## TASK-DAEMON-002 Supervisor restart orchestration
+
+Target spec:
+
+- FR-DAEMON-001
+- AC-DAEMON-001-01
+- NFR-DAEMON-001
+
+### Red
+
+- [x] Add `TEST-DAEMON-UNIT-002`.
+- [x] Confirm desktop has no supervisor that restarts daemon processes through the restart policy.
+
+### Green
+
+- [x] Start the daemon process through an injected process runner.
+- [x] Restart the daemon after unexpected exits while the policy allows it.
+- [x] Stop restarting after the policy reaches the restart ceiling.
+
+### Refactor
+
+- [x] Keep process orchestration separate from restart-count policy.
+
+### Verification
+
+- [x] Unit Test
