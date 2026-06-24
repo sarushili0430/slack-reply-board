@@ -3,7 +3,8 @@ requirement: FR-DRAFT-001
 acceptanceCriteria:
   - AC-DRAFT-001-01
 
-tasks: []
+tasks:
+  - TASK-DRAFT-001
 
 tests:
   - TEST-DRAFT-UNIT-001

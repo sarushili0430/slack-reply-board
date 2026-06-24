@@ -14,6 +14,24 @@ for (const file of workflowFiles) {
   const lines = content.split('\n');
 
   lines.forEach((line, index) => {
+    if (/^\s*pull_request_target\s*:/u.test(line)) {
+      violations.push(
+        `${relative(process.cwd(), file)}:${index + 1} pull_request_target is forbidden`,
+      );
+    }
+
+    if (/\b(?:curl|wget)\b.*\|\s*(?:bash|sh)\b/u.test(line)) {
+      violations.push(`${relative(process.cwd(), file)}:${index + 1} curl/wget piped to shell`);
+    }
+
+    const imageMatch = line.match(/^\s*image:\s*([^#\s]+)/u);
+
+    if (imageMatch !== null && !dockerDigestPattern.test(imageMatch[1])) {
+      violations.push(
+        `${relative(process.cwd(), file)}:${index + 1} Docker image must be pinned by digest`,
+      );
+    }
+
     const match = line.match(/^\s*uses:\s*([^#\s]+)/u);
 
     if (match === null) {
@@ -34,10 +52,28 @@ for (const file of workflowFiles) {
       violations.push(`${relative(process.cwd(), file)}:${index + 1} ${reference}`);
     }
   });
+
+  const rootPermissionsLine = lines.findIndex((line) => /^permissions:\s*$/u.test(line));
+
+  if (rootPermissionsLine !== -1) {
+    for (let index = rootPermissionsLine + 1; index < lines.length; index += 1) {
+      const line = lines[index];
+
+      if (/^\S/u.test(line)) {
+        break;
+      }
+
+      if (/^\s+\S+:\s*write\b/u.test(line)) {
+        violations.push(
+          `${relative(process.cwd(), file)}:${index + 1} workflow-level write permission`,
+        );
+      }
+    }
+  }
 }
 
 if (violations.length > 0) {
-  console.error('GitHub Actions must use full commit SHAs or Docker digests.');
+  console.error('GitHub Actions security policy violations found.');
   for (const violation of violations) {
     console.error(`- ${violation}`);
   }

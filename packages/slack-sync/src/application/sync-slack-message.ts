@@ -1,10 +1,12 @@
 import type { SlackMessageEventContract } from '@replyboard/contracts';
 
 import { createSlackEventId } from '../domain/slack-event-id.js';
-import type { MessageRepository } from '../ports/message-repository.js';
+import type { MessageIndex, MessageRepository } from '../ports/message-repository.js';
 
 export type SyncSlackMessagePorts = {
   readonly messageRepository: MessageRepository;
+  readonly keywordIndex: MessageIndex;
+  readonly vectorIndex: MessageIndex;
 };
 
 export type SyncSlackMessageResult = {
@@ -21,13 +23,17 @@ export async function syncSlackMessage(
     return { stored: false };
   }
 
-  await ports.messageRepository.saveMessage({
+  const message = {
     eventId,
     workspaceId: event.workspaceId,
     channelId: event.channelId,
     messageTs: event.messageTs,
     text: event.text,
-  });
+  };
+
+  await ports.messageRepository.saveMessage(message);
+  await ports.keywordIndex.indexMessage(message);
+  await ports.vectorIndex.indexMessage(message);
 
   return { stored: true };
 }

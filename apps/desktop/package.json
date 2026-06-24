@@ -4,6 +4,9 @@
   "private": true,
   "type": "module",
   "main": ".vite/build/main.js",
+  "config": {
+    "forge": "./forge.config.ts"
+  },
   "exports": {
     ".": {
       "types": "./src/renderer/app/App.tsx",
@@ -23,5 +26,8 @@
     "electron-squirrel-startup": "1.0.1",
     "react": "19.2.7",
     "react-dom": "19.2.7"
+  },
+  "devDependencies": {
+    "electron": "42.4.1"
   }
 }

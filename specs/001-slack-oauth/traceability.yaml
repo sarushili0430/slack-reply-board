@@ -3,7 +3,8 @@ requirement: FR-OAUTH-001
 acceptanceCriteria:
   - AC-OAUTH-001-01
 
-tasks: []
+tasks:
+  - TASK-OAUTH-001
 
 tests:
   - TEST-OAUTH-UNIT-001

@@ -5,6 +5,7 @@ packages:
 
 nodeVersion: 24.17.0
 engineStrict: true
+nodeLinker: hoisted
 
 minimumReleaseAge: 1440
 minimumReleaseAgeStrict: true

@@ -3,7 +3,8 @@ requirement: FR-HERMES-001
 acceptanceCriteria:
   - AC-HERMES-001-01
 
-tasks: []
+tasks:
+  - TASK-HERMES-001
 
 tests:
   - TEST-HERMES-UNIT-001

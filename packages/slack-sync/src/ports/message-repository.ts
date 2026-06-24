@@ -12,3 +12,7 @@ export type MessageRepository = {
   hasEventId(eventId: SlackEventId): Promise<boolean>;
   saveMessage(message: SyncedSlackMessage): Promise<void>;
 };
+
+export type MessageIndex = {
+  indexMessage(message: SyncedSlackMessage): Promise<void>;
+};

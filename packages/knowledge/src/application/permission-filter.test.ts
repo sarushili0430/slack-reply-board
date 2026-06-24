@@ -3,7 +3,7 @@ import { describe, expect, test } from 'vitest';
 import { filterAccessibleChunks, type PermissionedKnowledgeChunk } from './permission-filter.js';
 
 describe('FR-RAG-001 Permission-aware retrieval', () => {
-  test('AC-RAG-001-01: access喪失したチャンネルのチャンクを検索結果から除外する', () => {
+  test('TEST-RAG-UNIT-001 / AC-RAG-001-01: access喪失したチャンネルのチャンクを検索結果から除外する', () => {
     const chunks: readonly PermissionedKnowledgeChunk[] = [
       {
         id: 'chunk-1',

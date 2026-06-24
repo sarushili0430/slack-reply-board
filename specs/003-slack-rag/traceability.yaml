@@ -3,7 +3,8 @@ requirement: FR-RAG-001
 acceptanceCriteria:
   - AC-RAG-001-01
 
-tasks: []
+tasks:
+  - TASK-RAG-001
 
 tests:
   - TEST-RAG-UNIT-001

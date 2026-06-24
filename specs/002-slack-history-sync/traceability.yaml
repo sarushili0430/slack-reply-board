@@ -6,9 +6,11 @@ acceptanceCriteria:
 
 tasks:
   - TASK-SYNC-001
+  - TASK-SYNC-002
 
 tests:
   - TEST-SYNC-UNIT-001
+  - TEST-SYNC-UNIT-002
   - TEST-SYNC-ACCEPTANCE-001
 
 implementation:
