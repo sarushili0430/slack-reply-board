@@ -9,6 +9,7 @@ const repoDir = process.cwd();
 const appDir = resolve(repoDir, 'apps/desktop');
 const outDir = resolve(appDir, 'out');
 const platform = process.env.ELECTRON_PACKAGE_PLATFORM ?? process.platform;
+const packageTimeoutMs = 10 * 60 * 1000;
 const archList = (
   process.env.ELECTRON_PACKAGE_ARCHES ??
   process.env.ELECTRON_PACKAGE_ARCH ??
@@ -22,35 +23,65 @@ if (archList.length === 0) {
   throw new Error('No Electron package target architecture was configured.');
 }
 
-await rm(outDir, { force: true, recursive: true });
+const keepAlive = setInterval(() => undefined, 1000);
 
-for (const arch of archList) {
-  await packager({
-    arch,
-    asar: true,
-    dir: appDir,
-    ignore: [
-      /^\/coverage(?:\/|$)/,
-      /^\/dist(?:\/|$)/,
-      /^\/node_modules(?:\/|$)/,
-      /^\/out(?:\/|$)/,
-      /^\/src(?:\/|$)/,
-    ],
-    name: 'SlackReplyBoard',
-    out: outDir,
-    overwrite: true,
-    platform,
-    prune: true,
+main()
+  .catch((error) => {
+    console.error(error);
+    process.exitCode = 1;
+  })
+  .finally(() => {
+    clearInterval(keepAlive);
   });
+
+async function main() {
+  await rm(outDir, { force: true, recursive: true });
+
+  for (const arch of archList) {
+    await withTimeout(
+      packager({
+        arch,
+        asar: true,
+        dir: appDir,
+        ignore: [
+          /^\/coverage(?:\/|$)/,
+          /^\/dist(?:\/|$)/,
+          /^\/node_modules(?:\/|$)/,
+          /^\/out(?:\/|$)/,
+          /^\/src(?:\/|$)/,
+        ],
+        name: 'SlackReplyBoard',
+        out: outDir,
+        overwrite: true,
+        platform,
+        prune: true,
+      }),
+      packageTimeoutMs,
+      `Electron Packager timed out for ${platform}/${arch}.`,
+    );
+  }
+
+  const entries = await readdir(outDir, { withFileTypes: true }).catch(() => []);
+  const packages = entries.filter((entry) => entry.isDirectory()).map((entry) => entry.name);
+
+  if (packages.length === 0) {
+    throw new Error(`Electron Packager did not create package output at ${outDir}.`);
+  }
+
+  for (const packageName of packages) {
+    console.log(relative(repoDir, resolve(outDir, packageName)));
+  }
 }
 
-const entries = await readdir(outDir, { withFileTypes: true }).catch(() => []);
-const packages = entries.filter((entry) => entry.isDirectory()).map((entry) => entry.name);
+function withTimeout(promise, timeoutMs, message) {
+  let timeout;
+  const timeoutPromise = new Promise((_, reject) => {
+    timeout = setTimeout(() => {
+      reject(new Error(message));
+    }, timeoutMs);
+  });
 
-if (packages.length === 0) {
-  throw new Error(`Electron Packager did not create package output at ${outDir}.`);
-}
-
-for (const packageName of packages) {
-  console.log(relative(repoDir, resolve(outDir, packageName)));
+  return Promise.race([promise, timeoutPromise]).finally(() => {
+    clearTimeout(timeout);
+  });
 }
