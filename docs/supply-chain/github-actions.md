@@ -12,3 +12,14 @@ Run:
 ```bash
 node scripts/check-action-pins.mjs
 ```
+
+## License Policy
+
+Third-party package licenses must be explicitly allowed before merge. Workspace packages under
+`@replyboard/*` are first-party and are excluded from third-party license enforcement.
+
+Run:
+
+```bash
+pnpm security:licenses
+```
