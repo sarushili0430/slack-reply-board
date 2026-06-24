@@ -2,13 +2,17 @@ requirement: FR-HERMES-001
 
 acceptanceCriteria:
   - AC-HERMES-001-01
+  - AC-HERMES-001-02
 
 tasks:
   - TASK-HERMES-001
+  - TASK-HERMES-002
 
 tests:
   - TEST-HERMES-UNIT-001
+  - TEST-HERMES-UNIT-002
 
 implementation:
   - packages/hermes-harness/src/policies/allowed-tools.ts
+  - packages/hermes-harness/src/policies/tool-call-budget.ts
   - apps/hermes-mcp/src/tools/list-tools.ts
