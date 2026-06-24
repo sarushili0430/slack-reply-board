@@ -15,9 +15,20 @@ class InMemoryMessageRepository implements MessageRepository {
     return Promise.resolve(this.messages.has(eventId));
   }
 
-  saveMessage(message: SyncedSlackMessage): Promise<void> {
+  saveMessage(message: SyncedSlackMessage): Promise<boolean> {
+    const inserted = !this.messages.has(message.eventId);
     this.messages.set(message.eventId, message);
-    return Promise.resolve();
+    return Promise.resolve(inserted);
+  }
+}
+
+class RacingDuplicateMessageRepository implements MessageRepository {
+  hasEventId(): Promise<boolean> {
+    return Promise.resolve(false);
+  }
+
+  saveMessage(): Promise<boolean> {
+    return Promise.resolve(false);
   }
 }
 
@@ -77,5 +88,25 @@ describe('FR-SYNC-001 Slack履歴の差分同期', () => {
     expect(vectorIndex.messages).toEqual([
       expect.objectContaining({ channelId: 'C123', text: '検索に反映してください' }),
     ]);
+  });
+
+  test('TEST-SYNC-UNIT-003 / AC-SYNC-001-01: Raw Storeが重複を検出した場合はIndexへ反映しない', async () => {
+    const messageRepository = new RacingDuplicateMessageRepository();
+    const keywordIndex = new InMemoryMessageIndex();
+    const vectorIndex = new InMemoryMessageIndex();
+    const event = {
+      eventId: 'Ev125',
+      workspaceId: 'T123',
+      channelId: 'C123',
+      messageTs: '1710000000.000300',
+      text: '競合重複',
+      eventTime: '2026-06-23T10:00:00.000Z',
+    };
+
+    const result = await syncSlackMessage(event, { messageRepository, keywordIndex, vectorIndex });
+
+    expect(result.stored).toBe(false);
+    expect(keywordIndex.messages).toHaveLength(0);
+    expect(vectorIndex.messages).toHaveLength(0);
   });
 });

@@ -16,9 +16,10 @@ class AcceptanceMessageRepository implements MessageRepository {
     return Promise.resolve(this.messages.has(eventId));
   }
 
-  saveMessage(message: SyncedSlackMessage): Promise<void> {
+  saveMessage(message: SyncedSlackMessage): Promise<boolean> {
+    const inserted = !this.messages.has(message.eventId);
     this.messages.set(message.eventId, message);
-    return Promise.resolve();
+    return Promise.resolve(inserted);
   }
 }
 

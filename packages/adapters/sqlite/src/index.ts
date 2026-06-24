@@ -51,8 +51,8 @@ export class SqliteMessageRepository implements MessageRepository {
     return Promise.resolve(row !== undefined);
   }
 
-  saveMessage(message: SyncedSlackMessage): Promise<void> {
-    this.#database
+  saveMessage(message: SyncedSlackMessage): Promise<boolean> {
+    const result = this.#database
       .prepare<InsertMessageParams>(
         `
         insert or ignore into slack_messages (
@@ -72,7 +72,7 @@ export class SqliteMessageRepository implements MessageRepository {
       )
       .run(message);
 
-    return Promise.resolve();
+    return Promise.resolve(result.changes > 0);
   }
 
   close(): void {

@@ -10,7 +10,7 @@ export type SyncedSlackMessage = {
 
 export type MessageRepository = {
   hasEventId(eventId: SlackEventId): Promise<boolean>;
-  saveMessage(message: SyncedSlackMessage): Promise<void>;
+  saveMessage(message: SyncedSlackMessage): Promise<boolean>;
 };
 
 export type MessageIndex = {

@@ -31,7 +31,12 @@ export async function syncSlackMessage(
     text: event.text,
   };
 
-  await ports.messageRepository.saveMessage(message);
+  const stored = await ports.messageRepository.saveMessage(message);
+
+  if (!stored) {
+    return { stored: false };
+  }
+
   await ports.keywordIndex.indexMessage(message);
   await ports.vectorIndex.indexMessage(message);
 

@@ -105,3 +105,30 @@ Target spec:
 ### Verification
 
 - [x] SQLite Integration Test
+
+## TASK-SYNC-005 Atomic duplicate indexing guard
+
+Target spec:
+
+- FR-SYNC-001
+- AC-SYNC-001-01
+
+### Red
+
+- [x] Add `TEST-SYNC-UNIT-003`.
+- [x] Confirm indexing still happens when the Raw Store reports duplicate insertion.
+
+### Green
+
+- [x] Make `MessageRepository.saveMessage` report whether the row was inserted.
+- [x] Stop Keyword and Vector indexing when storage reports a duplicate.
+- [x] Return `{ stored: false }` for duplicate insertion races.
+
+### Refactor
+
+- [x] Keep idempotency decision at the Raw Store boundary.
+
+### Verification
+
+- [x] Unit Test
+- [x] SQLite Integration Test
