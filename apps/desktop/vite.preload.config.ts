@@ -9,7 +9,7 @@ export default defineConfig({
     lib: {
       entry: 'src/preload/index.ts',
       formats: ['cjs'],
-      fileName: () => 'preload.cjs',
+      fileName: () => 'index.js',
     },
     rollupOptions: {
       external: [

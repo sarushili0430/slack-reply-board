@@ -2,15 +2,21 @@ requirement: FR-PACKAGE-001
 
 acceptanceCriteria:
   - AC-PACKAGE-001-01
+  - AC-PACKAGE-001-02
 
 tasks:
   - TASK-PACKAGE-001
+  - TASK-PACKAGE-002
 
 tests:
   - TEST-PACKAGE-CONTRACT-001
+  - TEST-PACKAGE-CONTRACT-002
 
 implementation:
   - .github/workflows/package.yml
   - .github/workflows/release.yml
   - apps/desktop/forge.config.ts
+  - apps/desktop/src/main/windows/create-main-window.ts
+  - apps/desktop/vite.preload.config.ts
   - scripts/verify-release.mjs
+  - scripts/smoke-macos-app.mjs
