@@ -28,6 +28,9 @@ jobs:
       - name: Check traceability
         run: node scripts/check-traceability.mjs
 
+      - name: Check release workflow
+        run: node scripts/verify-release.mjs
+
   format:
     name: ci / format
     runs-on: ubuntu-24.04

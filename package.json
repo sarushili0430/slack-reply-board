@@ -26,11 +26,12 @@
     "architecture:check": "dependency-cruiser apps packages",
     "spec:lint": "node scripts/check-specs.mjs",
     "spec:traceability": "node scripts/check-traceability.mjs",
+    "release:verify": "node scripts/verify-release.mjs",
     "eval:retrieval": "node scripts/run-eval-placeholder.mjs retrieval",
     "eval:classification": "node scripts/run-eval-placeholder.mjs classification",
     "eval:grounding": "node scripts/run-eval-placeholder.mjs grounding",
     "eval": "pnpm eval:retrieval && pnpm eval:classification && pnpm eval:grounding",
-    "quality:fast": "pnpm spec:lint && pnpm spec:traceability && pnpm format:check && pnpm lint && pnpm typecheck",
+    "quality:fast": "pnpm spec:lint && pnpm spec:traceability && pnpm release:verify && pnpm format:check && pnpm lint && pnpm typecheck",
     "quality": "pnpm quality:fast && pnpm test:unit && pnpm test:contract && pnpm test:integration && pnpm test:acceptance && pnpm architecture:check && pnpm build"
   },
   "devDependencies": {
