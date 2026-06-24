@@ -62,6 +62,12 @@ transaction or through an outbox table protected by the same write boundary.
 Outbox events must be claimable with an idempotency key, retried at least once after lock expiry,
 and hidden from further claims after successful processing.
 
+### NFR-SYNC-005 Migration snapshot and failure safety
+
+SQLite schema migrations must create a local snapshot before mutating an existing database. If a
+migration fails, the database must remain openable by the previous application version and retain
+its pre-migration data.
+
 ## Security Impact
 
 - Slack tokens must stay behind the Slack adapter and Keychain adapter.

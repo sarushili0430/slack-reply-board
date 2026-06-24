@@ -216,3 +216,29 @@ Target spec:
 
 - [x] Unit Test
 - [x] SQLite Integration Test
+
+## TASK-SYNC-009 SQLite migration snapshot
+
+Target spec:
+
+- NFR-SYNC-005
+
+### Red
+
+- [x] Add `TEST-SYNC-INTEGRATION-004`.
+- [x] Confirm SQLite migrations do not create a pre-migration snapshot or preserve the old schema on
+      migration failure.
+
+### Green
+
+- [x] Create a local snapshot before applying schema migrations to an existing database.
+- [x] Apply schema migrations inside a transaction and advance `user_version`.
+- [x] Roll back failed migrations so the previous database remains openable.
+
+### Refactor
+
+- [x] Keep migration mechanics inside the SQLite adapter.
+
+### Verification
+
+- [x] SQLite Integration Test

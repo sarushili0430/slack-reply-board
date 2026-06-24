@@ -4,7 +4,11 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, test } from 'vitest';
 
-import { SqliteMessageRepository, SqliteOutboxRepository } from '@replyboard/adapters-sqlite';
+import {
+  migrateSqliteDatabase,
+  SqliteMessageRepository,
+  SqliteOutboxRepository,
+} from '@replyboard/adapters-sqlite';
 import { createSlackEventId, type SyncedSlackMessage } from '@replyboard/slack-sync';
 
 type StoredMessageRow = {
@@ -16,6 +20,10 @@ type OutboxEventRow = {
   readonly event_id: string;
   readonly event_type: string;
   readonly payload_json: string;
+};
+
+type MarkerRow = {
+  readonly id: string;
 };
 
 function createMessage(eventId: string, text: string): SyncedSlackMessage {
@@ -159,6 +167,135 @@ describe('FR-SYNC-001 Slack履歴の差分同期', () => {
     } finally {
       outboxRepository.close();
       messageRepository.close();
+      await rm(temporaryDirectory, { recursive: true, force: true });
+    }
+  });
+
+  test('TEST-SYNC-INTEGRATION-004 / NFR-SYNC-005: SQLite migrationは事前snapshotを作り失敗時に旧DBを起動可能に保つ', async () => {
+    const temporaryDirectory = await mkdtemp(join(tmpdir(), 'replyboard-sqlite-'));
+
+    try {
+      const successfulDatabasePath = join(temporaryDirectory, 'successful.sqlite');
+      const snapshotDirectory = join(temporaryDirectory, 'snapshots');
+      const successfulDatabase = new Database(successfulDatabasePath);
+
+      try {
+        successfulDatabase.exec(`
+          create table pre_migration_marker (
+            id text primary key
+          );
+          insert into pre_migration_marker (id) values ('before-success');
+          pragma user_version = 0;
+        `);
+      } finally {
+        successfulDatabase.close();
+      }
+
+      const migrationResult = migrateSqliteDatabase({
+        databasePath: successfulDatabasePath,
+        snapshotDirectory,
+        now: () => new Date('2026-06-23T10:00:00.000Z'),
+        migrations: [
+          {
+            version: 1,
+            name: 'add-post-migration-marker',
+            sql: `
+              create table post_migration_marker (
+                id text primary key
+              );
+            `,
+          },
+        ],
+      });
+
+      expect(migrationResult.fromVersion).toBe(0);
+      expect(migrationResult.toVersion).toBe(1);
+      expect(migrationResult.snapshotPath).not.toBeNull();
+
+      if (migrationResult.snapshotPath === null) {
+        throw new Error('Expected migration snapshot path');
+      }
+
+      const snapshotDatabase = new Database(migrationResult.snapshotPath, {
+        fileMustExist: true,
+        readonly: true,
+      });
+      const migratedDatabase = new Database(successfulDatabasePath, {
+        fileMustExist: true,
+        readonly: true,
+      });
+
+      try {
+        expect(snapshotDatabase.pragma('user_version', { simple: true })).toBe(0);
+        expect(
+          snapshotDatabase.prepare<[], MarkerRow>('select id from pre_migration_marker').all(),
+        ).toEqual([{ id: 'before-success' }]);
+        expect(() =>
+          snapshotDatabase.prepare('select id from post_migration_marker').all(),
+        ).toThrow(/no such table/);
+        expect(migratedDatabase.pragma('user_version', { simple: true })).toBe(1);
+        expect(migratedDatabase.prepare('select id from post_migration_marker').all()).toEqual([]);
+      } finally {
+        snapshotDatabase.close();
+        migratedDatabase.close();
+      }
+
+      const failedDatabasePath = join(temporaryDirectory, 'failed.sqlite');
+      const failedDatabase = new Database(failedDatabasePath);
+
+      try {
+        failedDatabase.exec(`
+          create table pre_migration_marker (
+            id text primary key
+          );
+          insert into pre_migration_marker (id) values ('before-failure');
+          pragma user_version = 0;
+        `);
+      } finally {
+        failedDatabase.close();
+      }
+
+      expect(() =>
+        migrateSqliteDatabase({
+          databasePath: failedDatabasePath,
+          snapshotDirectory,
+          now: () => new Date('2026-06-23T10:01:00.000Z'),
+          migrations: [
+            {
+              version: 1,
+              name: 'partial-marker',
+              sql: `
+                create table partial_migration_marker (
+                  id text primary key
+                );
+              `,
+            },
+            {
+              version: 2,
+              name: 'failing-migration',
+              sql: 'create table broken_migration (',
+            },
+          ],
+        }),
+      ).toThrow();
+
+      const rolledBackDatabase = new Database(failedDatabasePath, {
+        fileMustExist: true,
+        readonly: true,
+      });
+
+      try {
+        expect(rolledBackDatabase.pragma('user_version', { simple: true })).toBe(0);
+        expect(
+          rolledBackDatabase.prepare<[], MarkerRow>('select id from pre_migration_marker').all(),
+        ).toEqual([{ id: 'before-failure' }]);
+        expect(() =>
+          rolledBackDatabase.prepare('select id from partial_migration_marker').all(),
+        ).toThrow(/no such table/);
+      } finally {
+        rolledBackDatabase.close();
+      }
+    } finally {
       await rm(temporaryDirectory, { recursive: true, force: true });
     }
   });

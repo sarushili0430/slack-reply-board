@@ -1,6 +1,6 @@
 import Database from 'better-sqlite3';
-import { mkdirSync } from 'node:fs';
-import { dirname } from 'node:path';
+import { copyFileSync, existsSync, mkdirSync } from 'node:fs';
+import { basename, dirname, join } from 'node:path';
 
 import {
   createSlackEventId,
@@ -27,6 +27,27 @@ export type SqliteOutboxEvent = {
   readonly payload: unknown;
   readonly attemptCount: number;
 };
+
+export type SqliteMigration = {
+  readonly version: number;
+  readonly name: string;
+  readonly sql: string;
+};
+
+export type SqliteMigrationOptions = {
+  readonly databasePath: string;
+  readonly migrations: readonly SqliteMigration[];
+  readonly snapshotDirectory?: string;
+  readonly now?: () => Date;
+};
+
+export type SqliteMigrationResult = {
+  readonly fromVersion: number;
+  readonly toVersion: number;
+  readonly snapshotPath: string | null;
+};
+
+type SqliteDatabase = ReturnType<typeof Database>;
 
 type EventIdRow = {
   readonly event_id: string;
@@ -76,8 +97,87 @@ type MarkProcessedParams = {
   readonly processedAt: string;
 };
 
-function openDatabase(databasePath: string): ReturnType<typeof Database> {
+const sqliteSchemaMigrations: readonly SqliteMigration[] = [
+  {
+    version: 1,
+    name: 'initial-slack-message-and-outbox-schema',
+    sql: `
+      create table if not exists slack_messages (
+        event_id text primary key,
+        workspace_id text not null,
+        channel_id text not null,
+        message_ts text not null,
+        text text not null,
+        created_at text not null default (strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))
+      );
+
+      create table if not exists outbox_events (
+        id text primary key,
+        event_id text not null unique,
+        event_type text not null,
+        idempotency_key text not null unique,
+        payload_json text not null,
+        created_at text not null default (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
+        locked_until text,
+        attempt_count integer not null default 0,
+        processed_at text
+      );
+    `,
+  },
+];
+
+export function migrateSqliteDatabase(options: SqliteMigrationOptions): SqliteMigrationResult {
+  const orderedMigrations = orderMigrations(options.migrations);
+  mkdirSync(dirname(options.databasePath), { recursive: true });
+
+  const databaseExists = existsSync(options.databasePath);
+  const database = new Database(options.databasePath);
+
+  try {
+    const fromVersion = getUserVersion(database);
+    const pendingMigrations = orderedMigrations.filter(
+      (migration) => migration.version > fromVersion,
+    );
+    const lastMigration = pendingMigrations[pendingMigrations.length - 1];
+
+    if (lastMigration === undefined) {
+      return {
+        fromVersion,
+        toVersion: fromVersion,
+        snapshotPath: null,
+      };
+    }
+
+    const snapshotPath =
+      databaseExists && options.databasePath !== ':memory:'
+        ? snapshotDatabase({
+            database,
+            databasePath: options.databasePath,
+            fromVersion,
+            snapshotDirectory:
+              options.snapshotDirectory ?? join(dirname(options.databasePath), 'snapshots'),
+            now: options.now ?? (() => new Date()),
+          })
+        : null;
+
+    applyMigrations(database, pendingMigrations);
+
+    return {
+      fromVersion,
+      toVersion: lastMigration.version,
+      snapshotPath,
+    };
+  } finally {
+    database.close();
+  }
+}
+
+function openDatabase(databasePath: string): SqliteDatabase {
   mkdirSync(dirname(databasePath), { recursive: true });
+  migrateSqliteDatabase({
+    databasePath,
+    migrations: sqliteSchemaMigrations,
+  });
 
   const database = new Database(databasePath);
   database.pragma('journal_mode = WAL');
@@ -86,7 +186,7 @@ function openDatabase(databasePath: string): ReturnType<typeof Database> {
   return database;
 }
 
-function initializeSchema(database: ReturnType<typeof Database>): void {
+function initializeSchema(database: SqliteDatabase): void {
   database.exec(`
     create table if not exists slack_messages (
       event_id text primary key,
@@ -112,8 +212,71 @@ function initializeSchema(database: ReturnType<typeof Database>): void {
   `);
 }
 
+function orderMigrations(migrations: readonly SqliteMigration[]): readonly SqliteMigration[] {
+  const orderedMigrations = [...migrations].sort((left, right) => left.version - right.version);
+  let previousVersion = 0;
+
+  for (const migration of orderedMigrations) {
+    if (!Number.isInteger(migration.version) || migration.version <= 0) {
+      throw new Error(`SQLite migration "${migration.name}" must use a positive integer version.`);
+    }
+
+    if (migration.version <= previousVersion) {
+      throw new Error(
+        `SQLite migration version ${String(migration.version)} is duplicated or out of order.`,
+      );
+    }
+
+    previousVersion = migration.version;
+  }
+
+  return orderedMigrations;
+}
+
+function getUserVersion(database: SqliteDatabase): number {
+  const userVersion: unknown = database.pragma('user_version', { simple: true });
+
+  if (typeof userVersion !== 'number' || !Number.isInteger(userVersion)) {
+    throw new Error('SQLite user_version must be an integer.');
+  }
+
+  return userVersion;
+}
+
+function snapshotDatabase(options: {
+  readonly database: SqliteDatabase;
+  readonly databasePath: string;
+  readonly fromVersion: number;
+  readonly snapshotDirectory: string;
+  readonly now: () => Date;
+}): string {
+  mkdirSync(options.snapshotDirectory, { recursive: true });
+  options.database.pragma('wal_checkpoint(TRUNCATE)');
+
+  const timestamp = options.now().toISOString().replaceAll(':', '-').replaceAll('.', '-');
+  const snapshotPath = join(
+    options.snapshotDirectory,
+    `${basename(options.databasePath)}.v${String(options.fromVersion)}.${timestamp}.snapshot.sqlite`,
+  );
+
+  copyFileSync(options.databasePath, snapshotPath);
+
+  return snapshotPath;
+}
+
+function applyMigrations(database: SqliteDatabase, migrations: readonly SqliteMigration[]): void {
+  const runInTransaction = database.transaction(() => {
+    for (const migration of migrations) {
+      database.exec(migration.sql);
+      database.pragma(`user_version = ${String(migration.version)}`);
+    }
+  });
+
+  runInTransaction();
+}
+
 export class SqliteMessageRepository implements MessageRepository {
-  readonly #database: ReturnType<typeof Database>;
+  readonly #database: SqliteDatabase;
 
   constructor(options: SqliteMessageRepositoryOptions) {
     this.#database = openDatabase(options.databasePath);
@@ -218,7 +381,7 @@ export class SqliteMessageRepository implements MessageRepository {
 }
 
 export class SqliteOutboxRepository {
-  readonly #database: ReturnType<typeof Database>;
+  readonly #database: SqliteDatabase;
   readonly #lockDurationMs: number;
   readonly #now: () => Date;
 
