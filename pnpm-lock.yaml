@@ -19,15 +19,15 @@ importers:
       '@electron-forge/cli':
         specifier: 7.11.2
         version: 7.11.2(encoding@0.1.13)(esbuild@0.28.1)
-      '@electron-forge/core':
-        specifier: 7.11.2
-        version: 7.11.2(encoding@0.1.13)(esbuild@0.28.1)
       '@electron-forge/plugin-vite':
         specifier: 7.11.2
         version: 7.11.2
       '@electron-forge/shared-types':
         specifier: 7.11.2
         version: 7.11.2
+      '@electron/packager':
+        specifier: 18.4.4
+        version: 18.4.4
       '@eslint/js':
         specifier: 10.0.1
         version: 10.0.1(eslint@10.5.0(jiti@2.7.0))

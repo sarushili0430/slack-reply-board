@@ -68,9 +68,11 @@ jobs:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-          FORGE_ARCHES: arm64,x64
-          FORGE_PLATFORM: darwin
-        run: node scripts/package-electron-forge.mjs
+          ELECTRON_PACKAGE_ARCHES: arm64,x64
+          ELECTRON_PACKAGE_PLATFORM: darwin
+        run: |
+          pnpm --filter @replyboard/desktop build
+          node scripts/package-electron.mjs
 
       - name: Generate checksums
         run: >
