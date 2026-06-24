@@ -42,6 +42,24 @@ Then:
 - The message is added to Vector Index.
 - The message is searchable within 30 seconds at p95.
 
+### AC-SYNC-001-03 削除メッセージのIndex除去
+
+Given:
+
+- Initial sync has completed.
+- A Slack message has already been stored and indexed.
+
+When:
+
+- Slack emits a `message_deleted` event for that message.
+
+Then:
+
+- The message is removed from Raw Message Store.
+- The message is removed from Keyword Index.
+- The message is removed from Vector Index.
+- The message no longer appears in local search results.
+
 ## Non-Functional Requirements
 
 ### NFR-SYNC-001 Event reflection latency

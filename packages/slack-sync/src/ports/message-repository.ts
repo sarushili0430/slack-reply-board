@@ -1,5 +1,11 @@
 import type { SlackEventId } from '../domain/slack-event-id.js';
 
+export type SlackMessageReference = {
+  readonly workspaceId: string;
+  readonly channelId: string;
+  readonly messageTs: string;
+};
+
 export type SyncedSlackMessage = {
   readonly eventId: SlackEventId;
   readonly workspaceId: string;
@@ -15,4 +21,12 @@ export type MessageRepository = {
 
 export type MessageIndex = {
   indexMessage(message: SyncedSlackMessage): Promise<void>;
+};
+
+export type MessageDeletionRepository = {
+  deleteMessage(reference: SlackMessageReference): Promise<boolean>;
+};
+
+export type MessageDeletionIndex = {
+  deleteMessage(reference: SlackMessageReference): Promise<void>;
 };

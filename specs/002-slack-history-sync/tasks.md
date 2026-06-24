@@ -242,3 +242,39 @@ Target spec:
 ### Verification
 
 - [x] SQLite Integration Test
+
+## TASK-SYNC-010 削除メッセージのIndex除去
+
+Target spec:
+
+- FR-SYNC-001
+- AC-SYNC-001-03
+
+### Red
+
+- [x] Add `TEST-SYNC-CONTRACT-003`.
+- [x] Add `TEST-SYNC-UNIT-005`.
+- [x] Add `TEST-SYNC-INTEGRATION-005`.
+- [x] Add `TEST-SYNC-ACCEPTANCE-002` as a deletion regression acceptance test.
+- [x] Confirm Slack `message_deleted` payload conversion and deletion use case fail before
+      implementation exists.
+
+### Green
+
+- [x] Add a deleted message runtime contract.
+- [x] Map Slack `message_deleted` callbacks to the internal deletion contract.
+- [x] Add Raw Store, Keyword Index, and Vector Index deletion ports.
+- [x] Delete the stored Slack message row by workspace, channel, and timestamp in SQLite.
+- [x] Delete the Slack message reference from Raw Store and both indexes.
+
+### Refactor
+
+- [x] Keep Slack raw deletion payload shape inside the Slack adapter.
+- [x] Keep concrete index deletion adapters outside Application.
+
+### Verification
+
+- [x] Contract Test
+- [x] Unit Test
+- [x] SQLite Integration Test
+- [x] Acceptance Test

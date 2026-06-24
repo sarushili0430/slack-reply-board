@@ -4,8 +4,10 @@ import { basename, dirname, join } from 'node:path';
 
 import {
   createSlackEventId,
+  type MessageDeletionRepository,
   type MessageRepository,
   type SlackEventId,
+  type SlackMessageReference,
   type SyncedSlackMessage,
 } from '@replyboard/slack-sync';
 
@@ -67,6 +69,12 @@ type InsertMessageParams = {
   readonly channelId: string;
   readonly messageTs: string;
   readonly text: string;
+};
+
+type DeleteMessageParams = {
+  readonly workspaceId: string;
+  readonly channelId: string;
+  readonly messageTs: string;
 };
 
 type InsertOutboxEventParams = {
@@ -275,7 +283,7 @@ function applyMigrations(database: SqliteDatabase, migrations: readonly SqliteMi
   runInTransaction();
 }
 
-export class SqliteMessageRepository implements MessageRepository {
+export class SqliteMessageRepository implements MessageRepository, MessageDeletionRepository {
   readonly #database: SqliteDatabase;
 
   constructor(options: SqliteMessageRepositoryOptions) {
@@ -373,6 +381,21 @@ export class SqliteMessageRepository implements MessageRepository {
       messageTs: row.message_ts,
       text: row.text,
     });
+  }
+
+  deleteMessage(reference: SlackMessageReference): Promise<boolean> {
+    const result = this.#database
+      .prepare<DeleteMessageParams>(
+        `
+        delete from slack_messages
+        where workspace_id = @workspaceId
+          and channel_id = @channelId
+          and message_ts = @messageTs
+      `,
+      )
+      .run(reference);
+
+    return Promise.resolve(result.changes > 0);
   }
 
   close(): void {

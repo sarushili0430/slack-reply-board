@@ -1,6 +1,9 @@
 import { describe, expect, test } from 'vitest';
 
-import { mapSlackEventCallbackToMessageEvent } from './index.js';
+import {
+  mapSlackEventCallbackToMessageDeletionEvent,
+  mapSlackEventCallbackToMessageEvent,
+} from './index.js';
 
 describe('FR-SYNC-001 Slack履歴の差分同期', () => {
   test('TEST-SYNC-CONTRACT-001 / AC-SYNC-001-01: Slack event_callback payloadを内部Message Event Contractへ変換する', () => {
@@ -45,5 +48,35 @@ describe('FR-SYNC-001 Slack履歴の差分同期', () => {
         },
       }),
     ).toThrow();
+  });
+
+  test('TEST-SYNC-CONTRACT-003 / AC-SYNC-001-03: Slack message_deleted payloadを内部Deletion Event Contractへ変換する', () => {
+    const eventTime = Math.floor(Date.parse('2026-06-23T10:05:00.000Z') / 1000);
+
+    const event = mapSlackEventCallbackToMessageDeletionEvent({
+      type: 'event_callback',
+      event_id: 'Ev-contract-delete-1',
+      team_id: 'T-contract',
+      event_time: eventTime,
+      event: {
+        type: 'message',
+        subtype: 'message_deleted',
+        channel: 'C-contract',
+        deleted_ts: '1710000000.000300',
+        previous_message: {
+          type: 'message',
+          ts: '1710000000.000300',
+          text: '削除される本文',
+        },
+      },
+    });
+
+    expect(event).toEqual({
+      eventId: 'Ev-contract-delete-1',
+      workspaceId: 'T-contract',
+      channelId: 'C-contract',
+      messageTs: '1710000000.000300',
+      eventTime: '2026-06-23T10:05:00.000Z',
+    });
   });
 });

@@ -9,7 +9,11 @@ import {
   SqliteMessageRepository,
   SqliteOutboxRepository,
 } from '@replyboard/adapters-sqlite';
-import { createSlackEventId, type SyncedSlackMessage } from '@replyboard/slack-sync';
+import {
+  createSlackEventId,
+  type SlackMessageReference,
+  type SyncedSlackMessage,
+} from '@replyboard/slack-sync';
 
 type StoredMessageRow = {
   readonly event_id: string;
@@ -33,6 +37,14 @@ function createMessage(eventId: string, text: string): SyncedSlackMessage {
     channelId: 'C-integration',
     messageTs: '1710000000.000500',
     text,
+  };
+}
+
+function createMessageReference(): SlackMessageReference {
+  return {
+    workspaceId: 'T-integration',
+    channelId: 'C-integration',
+    messageTs: '1710000000.000500',
   };
 }
 
@@ -296,6 +308,27 @@ describe('FR-SYNC-001 Slack履歴の差分同期', () => {
         rolledBackDatabase.close();
       }
     } finally {
+      await rm(temporaryDirectory, { recursive: true, force: true });
+    }
+  });
+
+  test('TEST-SYNC-INTEGRATION-005 / AC-SYNC-001-03: SQLite Raw Message StoreはSlack参照で削除する', async () => {
+    const temporaryDirectory = await mkdtemp(join(tmpdir(), 'replyboard-sqlite-'));
+    const databasePath = join(temporaryDirectory, 'messages.sqlite');
+    const repository = new SqliteMessageRepository({ databasePath });
+
+    try {
+      await repository.saveMessage(createMessage('Ev-integration-delete-1', 'delete body'));
+
+      const deleted = await repository.deleteMessage(createMessageReference());
+      const secondDelete = await repository.deleteMessage(createMessageReference());
+      const storedMessage = await repository.findMessageByEventId('Ev-integration-delete-1');
+
+      expect(deleted).toBe(true);
+      expect(secondDelete).toBe(false);
+      expect(storedMessage).toBeNull();
+    } finally {
+      repository.close();
       await rm(temporaryDirectory, { recursive: true, force: true });
     }
   });
