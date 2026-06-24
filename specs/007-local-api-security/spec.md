@@ -22,7 +22,25 @@ Then:
 - Missing, malformed, or mismatched tokens are rejected.
 - The session token conforms to the local API Runtime Schema.
 
+### AC-LOCAL-001-02 Health endpoint requires the session token
+
+Given:
+
+- The daemon local API is listening on a loopback interface.
+- The daemon has generated a random local API session token.
+
+When:
+
+- The desktop main process requests `GET /health`.
+
+Then:
+
+- Requests without the current `Authorization: Bearer <session_token>` header are rejected.
+- Requests with the current session token return a Runtime Schema validated daemon health payload.
+- The local API runtime can be stopped cleanly.
+
 ## Security Impact
 
 - The local API is not reachable without the random session token.
 - Renderer code must not generate or store the token directly.
+- The desktop main process can verify daemon readiness without exposing the token to Renderer code.
