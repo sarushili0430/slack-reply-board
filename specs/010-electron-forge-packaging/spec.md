@@ -71,9 +71,27 @@ When:
 
 Then:
 
-- Workflows use `pnpm --filter @replyboard/desktop exec electron-forge package`.
+- Workflows use `pnpm exec electron-forge package`.
 - Workflows pass `--platform` and `--arch` directly to Forge.
 - Workflows pass packager-only `--out=out` after Forge's `--` argument separator.
+
+### AC-PACKAGE-001-05 Package workflows run from the desktop workspace directory
+
+Given:
+
+- Package and release workflows invoke Electron Forge on macOS CI.
+- The workflow later smoke tests and uploads `apps/desktop/out`.
+
+When:
+
+- Forge packaging runs.
+
+Then:
+
+- The packaging step uses `working-directory: apps/desktop`.
+- The packaging command uses `pnpm exec electron-forge package`.
+- The packaging step waits for the relative `out` directory from `apps/desktop`.
+- The root-level smoke and upload steps continue to consume `apps/desktop/out`.
 
 ## Security Impact
 
