@@ -27,6 +27,15 @@ Every implementation report must include:
 - Verification commands
 - Remaining risks
 
+## Branch Workflow
+
+- Use `feature/<spec-id>-<short-name>` for normal implementation work.
+- Keep feature branches scoped to one spec task or a tightly related set of tasks.
+- Use `release/vX.Y.Z` only for release candidate preparation.
+- Use `hotfix/vX.Y.Z` only for urgent fixes cut from an existing release tag.
+- Use `vX.Y.Z` tags as the only production release trigger.
+- Do not create or target a long-lived `develop` branch.
+
 ## Architecture Boundaries
 
 Dependency direction is fixed:

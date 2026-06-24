@@ -8,6 +8,14 @@ if (!/build-macos:[\s\S]*?environment:\s*release/u.test(workflowText)) {
   errors.push('release / macos must use the protected release environment');
 }
 
+if (/workflow_dispatch:/u.test(workflowText)) {
+  errors.push('release workflow must not allow manual production releases');
+}
+
+if (!/tags:\s*\n\s*-\s*'v\*'/u.test(workflowText)) {
+  errors.push('release workflow must be triggered by v* tags');
+}
+
 const releaseWorkflowRequirements = [
   'APPLE_CERTIFICATE_BASE64',
   'APPLE_CERTIFICATE_PASSWORD',

@@ -17,3 +17,7 @@ quality gate, imports the signing certificate into a temporary keychain, signs
 and notarizes the macOS application, emits SHA-256 checksums, creates artifact
 attestation, uploads build artifacts, and publishes tagged builds to GitHub
 Releases.
+
+Production releases are triggered only by pushing a `vX.Y.Z` tag. Use a
+`release/vX.Y.Z` branch to stabilize a release candidate, merge it back to
+`main`, and tag the merged commit.
