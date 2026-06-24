@@ -1,0 +1,14 @@
+requirement: FR-RAG-002
+
+acceptanceCriteria:
+  - AC-RAG-002-01
+
+tasks:
+  - TASK-RAG-002
+
+tests:
+  - TEST-RAG-UNIT-002
+
+implementation:
+  - packages/knowledge/src/application/index-version-filter.ts
+  - packages/knowledge/src/index.ts
