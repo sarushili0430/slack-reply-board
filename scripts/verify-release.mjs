@@ -49,6 +49,17 @@ if (!packagingWorkflowText.includes('pnpm --filter @replyboard/desktop package')
 }
 
 if (
+  !packageWorkflowText.includes(
+    'pnpm --filter @replyboard/desktop package -- --platform=darwin --arch=arm64 --out=out',
+  ) ||
+  !workflowText.includes(
+    'pnpm --filter @replyboard/desktop package -- --platform=darwin --arch=arm64,x64 --out=out',
+  )
+) {
+  errors.push('package and release workflows must pass Forge --out=out');
+}
+
+if (
   !packageWorkflowText.includes('pnpm package:smoke') ||
   !workflowText.includes('pnpm package:smoke')
 ) {

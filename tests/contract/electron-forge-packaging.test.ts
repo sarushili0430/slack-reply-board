@@ -41,4 +41,22 @@ describe('FR-PACKAGE-001 Electron Forge packaging', () => {
       releaseWorkflow.indexOf('actions/upload-artifact@'),
     );
   });
+
+  test('TEST-PACKAGE-CONTRACT-003 AC-PACKAGE-001-03: workflows pass Forge an explicit output directory', async () => {
+    const [packageWorkflow, releaseWorkflow, releaseVerifier] = await Promise.all([
+      readFile(packageWorkflowPath, 'utf8'),
+      readFile(releaseWorkflowPath, 'utf8'),
+      readFile('scripts/verify-release.mjs', 'utf8'),
+    ]);
+
+    expect(packageWorkflow).toContain(
+      'pnpm --filter @replyboard/desktop package -- --platform=darwin --arch=arm64 --out=out',
+    );
+    expect(releaseWorkflow).toContain(
+      'pnpm --filter @replyboard/desktop package -- --platform=darwin --arch=arm64,x64 --out=out',
+    );
+    expect(packageWorkflow).toContain('apps/desktop/out');
+    expect(releaseWorkflow).toContain('apps/desktop/out');
+    expect(releaseVerifier).toContain('--out=out');
+  });
 });

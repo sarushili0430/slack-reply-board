@@ -55,3 +55,31 @@ Target spec:
 - [x] Contract Test
 - [x] Packaged App Smoke
 - [x] Quality
+
+## TASK-PACKAGE-003 Explicit Forge output directory
+
+Target spec:
+
+- FR-PACKAGE-001
+- AC-PACKAGE-001-03
+
+### Red
+
+- [x] Add `TEST-PACKAGE-CONTRACT-003`.
+- [x] Confirm package and release workflows do not pass an explicit Forge output directory.
+
+### Green
+
+- [x] Pass `--out=out` to Forge packaging in `package.yml`.
+- [x] Pass `--out=out` to Forge packaging in `release.yml`.
+- [x] Update release verification to require explicit Forge output.
+
+### Refactor
+
+- [x] Keep package and release output paths aligned with `scripts/smoke-macos-app.mjs`.
+
+### Verification
+
+- [x] Contract Test
+- [x] Local Forge Package Smoke
+- [x] Quality
