@@ -20,7 +20,7 @@ const demoCards: readonly BoardCardSummaryContract[] = [
 
 export function App(): JSX.Element {
   return (
-    <main className="shell">
+    <main className="shell" data-testid="reply-board-ready">
       <aside className="sidebar" aria-label="Board navigation">
         <h1>Reply Board</h1>
         <nav>
