@@ -27,3 +27,31 @@ Target spec:
 - [x] Contract Test
 - [x] Quality
 - [x] Local Forge package smoke
+
+## TASK-PACKAGE-002 Smoke test packaged macOS app
+
+Target spec:
+
+- FR-PACKAGE-001
+- AC-PACKAGE-001-02
+
+### Red
+
+- [x] Add `TEST-PACKAGE-CONTRACT-002`.
+- [x] Confirm the contract fails while workflows do not run packaged app smoke.
+
+### Green
+
+- [x] Add a packaged macOS app smoke script.
+- [x] Run the smoke after Forge packaging in `package.yml`.
+- [x] Run the smoke after Forge packaging in `release.yml`.
+
+### Refactor
+
+- [x] Keep packaged smoke reusable between package and release workflows.
+
+### Verification
+
+- [x] Contract Test
+- [x] Packaged App Smoke
+- [x] Quality

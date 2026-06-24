@@ -28,6 +28,7 @@ const releaseWorkflowRequirements = [
   'APPLE_TEAM_ID',
   'KEYCHAIN_PASSWORD',
   'security import',
+  'pnpm package:smoke',
   'shasum -a 256',
   'node scripts/generate-sbom.mjs apps/desktop/out/sbom.spdx.json',
   'actions/attest-build-provenance',
@@ -45,6 +46,13 @@ if (!packagingWorkflowText.includes('pnpm --filter @replyboard/desktop package')
   errors.push(
     'package and release workflows must invoke Electron Forge through the desktop package script',
   );
+}
+
+if (
+  !packageWorkflowText.includes('pnpm package:smoke') ||
+  !workflowText.includes('pnpm package:smoke')
+) {
+  errors.push('package and release workflows must smoke test the packaged macOS app');
 }
 
 if (packagingWorkflowText.includes('electron-packager')) {

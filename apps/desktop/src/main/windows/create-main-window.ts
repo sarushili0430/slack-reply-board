@@ -13,7 +13,7 @@ export async function createMainWindow(): Promise<void> {
     minHeight: 600,
     show: false,
     webPreferences: {
-      preload: join(currentDirectory, 'preload.cjs'),
+      preload: join(currentDirectory, 'index.js'),
       nodeIntegration: false,
       contextIsolation: true,
       sandbox: true,

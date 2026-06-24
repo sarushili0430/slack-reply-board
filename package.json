@@ -27,6 +27,7 @@
     "spec:lint": "node scripts/check-specs.mjs",
     "spec:traceability": "node scripts/check-traceability.mjs",
     "release:verify": "node scripts/verify-release.mjs",
+    "package:smoke": "node scripts/smoke-macos-app.mjs",
     "security:licenses": "node scripts/check-license-policy.mjs",
     "eval:retrieval": "node scripts/check-evals.mjs retrieval",
     "eval:classification": "node scripts/check-evals.mjs classification",

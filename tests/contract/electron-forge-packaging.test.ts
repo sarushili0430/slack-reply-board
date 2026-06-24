@@ -25,4 +25,20 @@ describe('FR-PACKAGE-001 Electron Forge packaging', () => {
     expect(forgeConfig).toContain("join(projectDir, 'build/entitlements.mac.plist')");
     expect(forgeConfig).toContain('osxNotarize');
   });
+
+  test('TEST-PACKAGE-CONTRACT-002 AC-PACKAGE-001-02: workflows smoke test packaged macOS app before upload or release', async () => {
+    const [packageWorkflow, releaseWorkflow] = await Promise.all([
+      readFile(packageWorkflowPath, 'utf8'),
+      readFile(releaseWorkflowPath, 'utf8'),
+    ]);
+
+    expect(packageWorkflow).toContain('pnpm package:smoke');
+    expect(releaseWorkflow).toContain('pnpm package:smoke');
+    expect(packageWorkflow.indexOf('pnpm package:smoke')).toBeLessThan(
+      packageWorkflow.indexOf('actions/upload-artifact@'),
+    );
+    expect(releaseWorkflow.indexOf('pnpm package:smoke')).toBeLessThan(
+      releaseWorkflow.indexOf('actions/upload-artifact@'),
+    );
+  });
 });
