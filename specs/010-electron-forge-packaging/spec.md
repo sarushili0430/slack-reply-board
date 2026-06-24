@@ -42,6 +42,23 @@ Then:
 - The smoke verifies Renderer Node globals remain unavailable.
 - The smoke exits the application cleanly before artifact upload or release publication.
 
+### AC-PACKAGE-001-03 Package workflows use the same explicit output directory
+
+Given:
+
+- Package and release workflows invoke Electron Forge.
+
+When:
+
+- Forge packaging completes on macOS CI.
+
+Then:
+
+- Both workflows pass an explicit `--out=out` argument to Forge packaging.
+- Both workflows wait for and smoke test `apps/desktop/out`.
+- A successful Forge command cannot be treated as a successful package workflow unless
+  `apps/desktop/out` exists and contains at least one packaged artifact.
+
 ## Security Impact
 
 - Release signing and notarization secrets remain provided by the protected `release` environment.
