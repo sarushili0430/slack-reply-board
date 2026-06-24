@@ -1,0 +1,14 @@
+requirement: FR-LOCAL-002
+
+acceptanceCriteria:
+  - AC-LOCAL-002-01
+
+tasks:
+  - TASK-LOCAL-002
+
+tests:
+  - TEST-LOCAL-UNIT-002
+
+implementation:
+  - apps/daemon/src/local-api/listen-options.ts
+  - apps/daemon/src/index.ts
