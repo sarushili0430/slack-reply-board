@@ -1,0 +1,18 @@
+requirement: FR-E2E-001
+
+acceptanceCriteria:
+  - AC-E2E-001-01
+
+tasks:
+  - TASK-E2E-001
+
+tests:
+  - TEST-E2E-ELECTRON-001
+
+implementation:
+  - tests/e2e/electron-launch-smoke.spec.ts
+  - apps/desktop/src/renderer/app/App.tsx
+  - apps/desktop/vite.main.config.ts
+  - apps/desktop/vite.renderer.config.ts
+  - .github/workflows/ci.yml
+  - package.json
