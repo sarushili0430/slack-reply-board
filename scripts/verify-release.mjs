@@ -42,20 +42,20 @@ for (const requiredText of releaseWorkflowRequirements) {
   }
 }
 
-if (
-  !packagingWorkflowText.includes('pnpm --filter @replyboard/desktop exec electron-forge package')
-) {
-  errors.push(
-    'package and release workflows must invoke Electron Forge through the desktop workspace',
-  );
+if (!packagingWorkflowText.includes('working-directory: apps/desktop')) {
+  errors.push('package and release workflows must run Forge from apps/desktop');
+}
+
+if (!packagingWorkflowText.includes('pnpm exec electron-forge package')) {
+  errors.push('package and release workflows must invoke Electron Forge through pnpm exec');
 }
 
 if (
   !packageWorkflowText.includes(
-    'pnpm --filter @replyboard/desktop exec electron-forge package --platform=darwin --arch=arm64 -- --out=out',
+    'pnpm exec electron-forge package --platform=darwin --arch=arm64 -- --out=out',
   ) ||
   !workflowText.includes(
-    'pnpm --filter @replyboard/desktop exec electron-forge package --platform=darwin --arch=arm64,x64 -- --out=out',
+    'pnpm exec electron-forge package --platform=darwin --arch=arm64,x64 -- --out=out',
   )
 ) {
   errors.push('package and release workflows must pass Forge --out=out');

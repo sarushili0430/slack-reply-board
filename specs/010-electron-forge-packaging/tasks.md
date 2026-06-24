@@ -99,14 +99,43 @@ Target spec:
 
 ### Green
 
-- [x] Use `pnpm --filter @replyboard/desktop exec electron-forge package` in `package.yml`.
-- [x] Use `pnpm --filter @replyboard/desktop exec electron-forge package` in `release.yml`.
+- [x] Use `pnpm exec electron-forge package` from the desktop workspace in `package.yml`.
+- [x] Use `pnpm exec electron-forge package` from the desktop workspace in `release.yml`.
 - [x] Update release verification to reject the extra `--` before Forge platform and architecture
       arguments.
 
 ### Refactor
 
 - [x] Keep package and release Forge invocations aligned.
+
+### Verification
+
+- [x] Contract Test
+- [x] Local Forge Package Smoke
+- [x] Quality
+
+## TASK-PACKAGE-005 Run Forge from desktop working directory
+
+Target spec:
+
+- FR-PACKAGE-001
+- AC-PACKAGE-001-05
+
+### Red
+
+- [x] Add `TEST-PACKAGE-CONTRACT-004`.
+- [x] Confirm package and release workflows do not set `working-directory: apps/desktop`.
+
+### Green
+
+- [x] Set `working-directory: apps/desktop` in `package.yml`.
+- [x] Set `working-directory: apps/desktop` in `release.yml`.
+- [x] Wait for the relative `out` directory inside the packaging step.
+- [x] Update release verification to require the desktop working directory.
+
+### Refactor
+
+- [x] Keep root-level smoke, upload, checksum, SBOM, and release paths on `apps/desktop/out`.
 
 ### Verification
 

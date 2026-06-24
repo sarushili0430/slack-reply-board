@@ -15,7 +15,8 @@ describe('FR-PACKAGE-001 Electron Forge packaging', () => {
     ]);
     const workflowText = `${packageWorkflow}\n${releaseWorkflow}`;
 
-    expect(workflowText).toContain('pnpm --filter @replyboard/desktop exec electron-forge package');
+    expect(workflowText).toContain('working-directory: apps/desktop');
+    expect(workflowText).toContain('pnpm exec electron-forge package');
     expect(workflowText).not.toContain('package -- --platform=darwin');
     expect(workflowText).not.toContain('electron-packager');
 
@@ -51,13 +52,31 @@ describe('FR-PACKAGE-001 Electron Forge packaging', () => {
     ]);
 
     expect(packageWorkflow).toContain(
-      'pnpm --filter @replyboard/desktop exec electron-forge package --platform=darwin --arch=arm64 -- --out=out',
+      'pnpm exec electron-forge package --platform=darwin --arch=arm64 -- --out=out',
     );
     expect(releaseWorkflow).toContain(
-      'pnpm --filter @replyboard/desktop exec electron-forge package --platform=darwin --arch=arm64,x64 -- --out=out',
+      'pnpm exec electron-forge package --platform=darwin --arch=arm64,x64 -- --out=out',
     );
     expect(packageWorkflow).toContain('apps/desktop/out');
     expect(releaseWorkflow).toContain('apps/desktop/out');
     expect(releaseVerifier).toContain('--out=out');
+  });
+
+  test('TEST-PACKAGE-CONTRACT-004 AC-PACKAGE-001-05: workflows package from the desktop workspace directory', async () => {
+    const [packageWorkflow, releaseWorkflow] = await Promise.all([
+      readFile(packageWorkflowPath, 'utf8'),
+      readFile(releaseWorkflowPath, 'utf8'),
+    ]);
+
+    expect(packageWorkflow).toContain('working-directory: apps/desktop');
+    expect(releaseWorkflow).toContain('working-directory: apps/desktop');
+    expect(packageWorkflow).toContain(
+      'pnpm exec electron-forge package --platform=darwin --arch=arm64 -- --out=out',
+    );
+    expect(releaseWorkflow).toContain(
+      'pnpm exec electron-forge package --platform=darwin --arch=arm64,x64 -- --out=out',
+    );
+    expect(packageWorkflow).toContain('if [ -d out ]');
+    expect(releaseWorkflow).toContain('if [ -d out ]');
   });
 });
