@@ -24,6 +24,7 @@ const child = spawn(appExecutablePath, [], {
     REPLYBOARD_E2E: '1',
     REPLYBOARD_PACKAGE_SMOKE_DAEMON_READY_FILE: daemonReadyFilePath,
     REPLYBOARD_PACKAGE_SMOKE_QUIT_AFTER_READY: '1',
+    REPLYBOARD_PACKAGE_SMOKE_MAIN_PROCESS: '1',
     REPLYBOARD_PACKAGE_SMOKE_READY_FILE: appReadyFilePath,
   },
   stdio: ['ignore', 'pipe', 'pipe'],

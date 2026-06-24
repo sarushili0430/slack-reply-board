@@ -48,9 +48,11 @@ describe('FR-PACKAGE-001 Electron Forge packaging', () => {
     );
     expect(smokeScript).toContain("import { spawn } from 'node:child_process'");
     expect(smokeScript).not.toContain("from 'playwright'");
+    expect(smokeScript).toContain('REPLYBOARD_PACKAGE_SMOKE_MAIN_PROCESS');
     expect(smokeScript).toContain('REPLYBOARD_PACKAGE_SMOKE_READY_FILE');
     expect(smokeScript).toContain('REPLYBOARD_PACKAGE_SMOKE_DAEMON_READY_FILE');
     expect(smokeScript).toContain('REPLYBOARD_PACKAGE_SMOKE_QUIT_AFTER_READY');
+    expect(smokeScript).toContain('waitForProcessExit');
   });
 
   test('TEST-PACKAGE-CONTRACT-003 AC-PACKAGE-001-03: workflows pass Forge an explicit output directory', async () => {

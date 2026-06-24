@@ -31,6 +31,7 @@ implementation:
   - .github/workflows/package.yml
   - .github/workflows/release.yml
   - apps/desktop/forge.config.ts
+  - apps/desktop/src/main/app-lifecycle/package-smoke-main-process.ts
   - apps/desktop/src/main/app-lifecycle/package-smoke-ready-signal.ts
   - apps/desktop/src/main/app-lifecycle/register-app-lifecycle.ts
   - apps/desktop/src/main/index.ts
