@@ -83,3 +83,33 @@ Target spec:
 - [x] Contract Test
 - [x] Local Forge Package Smoke
 - [x] Quality
+
+## TASK-PACKAGE-004 Pass Forge arguments through pnpm exec
+
+Target spec:
+
+- FR-PACKAGE-001
+- AC-PACKAGE-001-04
+
+### Red
+
+- [x] Update `TEST-PACKAGE-CONTRACT-001`.
+- [x] Confirm package and release workflows still insert an extra `--` before Forge platform and
+      architecture arguments.
+
+### Green
+
+- [x] Use `pnpm --filter @replyboard/desktop exec electron-forge package` in `package.yml`.
+- [x] Use `pnpm --filter @replyboard/desktop exec electron-forge package` in `release.yml`.
+- [x] Update release verification to reject the extra `--` before Forge platform and architecture
+      arguments.
+
+### Refactor
+
+- [x] Keep package and release Forge invocations aligned.
+
+### Verification
+
+- [x] Contract Test
+- [x] Local Forge Package Smoke
+- [x] Quality
