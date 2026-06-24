@@ -1,0 +1,14 @@
+requirement: FR-LOCAL-001
+
+acceptanceCriteria:
+  - AC-LOCAL-001-01
+
+tasks:
+  - TASK-LOCAL-001
+
+tests:
+  - TEST-LOCAL-UNIT-001
+
+implementation:
+  - apps/daemon/src/local-api/session-token.ts
+  - packages/contracts/src/local-api/auth.ts
