@@ -9,6 +9,7 @@ const repoDir = process.cwd();
 const appDir = resolve(repoDir, 'apps/desktop');
 const outDir = resolve(appDir, 'out');
 const platform = process.env.FORGE_PLATFORM ?? process.platform;
+const packageTimeoutMs = 10 * 60 * 1000;
 const archList = (process.env.FORGE_ARCHES ?? process.env.FORGE_ARCH ?? process.arch)
   .split(',')
   .map((arch) => arch.trim())
@@ -20,13 +21,23 @@ if (archList.length === 0) {
 
 process.chdir(appDir);
 
-for (const arch of archList) {
-  await api.package({
-    arch,
-    dir: appDir,
-    interactive: false,
-    platform,
-  });
+const keepAlive = setInterval(() => undefined, 1000);
+
+try {
+  for (const arch of archList) {
+    await withTimeout(
+      api.package({
+        arch,
+        dir: appDir,
+        interactive: false,
+        platform,
+      }),
+      packageTimeoutMs,
+      `Electron Forge package timed out for ${platform}/${arch}.`,
+    );
+  }
+} finally {
+  clearInterval(keepAlive);
 }
 
 const entries = await readdir(outDir, { withFileTypes: true }).catch(() => []);
@@ -38,4 +49,17 @@ if (packages.length === 0) {
 
 for (const packageName of packages) {
   console.log(relative(repoDir, resolve(outDir, packageName)));
+}
+
+function withTimeout(promise, timeoutMs, message) {
+  let timeout;
+  const timeoutPromise = new Promise((_, reject) => {
+    timeout = setTimeout(() => {
+      reject(new Error(message));
+    }, timeoutMs);
+  });
+
+  return Promise.race([promise, timeoutPromise]).finally(() => {
+    clearTimeout(timeout);
+  });
 }
