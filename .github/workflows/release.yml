@@ -71,16 +71,18 @@ jobs:
         run: pnpm --filter @replyboard/desktop package
 
       - name: Generate checksums
-        run: find out -type f -maxdepth 3 -print0 | xargs -0 shasum -a 256 > out/SHA256SUMS.sha256
+        run: >
+          find apps/desktop/out -maxdepth 3 -type f -print0 |
+          xargs -0 shasum -a 256 > apps/desktop/out/SHA256SUMS.sha256
 
       - name: Attest artifacts
         uses: actions/attest-build-provenance@e8998f949152b193b063cb0ec769d69d929409be # v2.4.0
         with:
-          subject-path: out/**
+          subject-path: apps/desktop/out/**
 
       - name: Upload artifact
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: slack-reply-board-release-macos
-          path: out
+          path: apps/desktop/out
           if-no-files-found: error
