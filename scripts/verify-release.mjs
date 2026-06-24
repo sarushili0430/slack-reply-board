@@ -4,6 +4,7 @@ import { join } from 'node:path';
 const workflowText = await readFile('.github/workflows/release.yml', 'utf8');
 const packageWorkflowText = await readFile('.github/workflows/package.yml', 'utf8');
 const forgeConfigText = await readFile('apps/desktop/forge.config.ts', 'utf8');
+const forgePackageScriptText = await readFile('scripts/package-electron-forge.mjs', 'utf8');
 const errors = [];
 const packagingWorkflowText = `${packageWorkflowText}\n${workflowText}`;
 
@@ -42,23 +43,31 @@ for (const requiredText of releaseWorkflowRequirements) {
   }
 }
 
-if (!packagingWorkflowText.includes('working-directory: apps/desktop')) {
-  errors.push('package and release workflows must run Forge from apps/desktop');
+if (!packagingWorkflowText.includes('node scripts/package-electron-forge.mjs')) {
+  errors.push('package and release workflows must invoke the Forge packaging script');
 }
 
-if (!packagingWorkflowText.includes('pnpm exec electron-forge package')) {
-  errors.push('package and release workflows must invoke Electron Forge through pnpm exec');
+if (!forgePackageScriptText.includes("await import('@electron-forge/core')")) {
+  errors.push('Forge packaging script must import @electron-forge/core');
+}
+
+if (!forgePackageScriptText.includes('await api.package')) {
+  errors.push('Forge packaging script must call api.package');
+}
+
+if (!forgePackageScriptText.includes('process.chdir(appDir)')) {
+  errors.push('Forge packaging script must package from apps/desktop');
 }
 
 if (
   !packageWorkflowText.includes(
-    'pnpm exec electron-forge package --platform=darwin --arch=arm64 -- --out=out',
+    'node scripts/package-electron-forge.mjs --platform=darwin --arch=arm64 --out=apps/desktop/out',
   ) ||
   !workflowText.includes(
-    'pnpm exec electron-forge package --platform=darwin --arch=arm64,x64 -- --out=out',
+    'node scripts/package-electron-forge.mjs --platform=darwin --arch=arm64,x64 --out=apps/desktop/out',
   )
 ) {
-  errors.push('package and release workflows must pass Forge --out=out');
+  errors.push('package and release workflows must pass apps/desktop/out to the Forge script');
 }
 
 if (packagingWorkflowText.includes('package -- --platform=darwin')) {

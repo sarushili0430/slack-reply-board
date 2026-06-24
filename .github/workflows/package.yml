@@ -37,18 +37,7 @@ jobs:
         run: pnpm gitflow:check
 
       - name: Package Electron app
-        working-directory: apps/desktop
-        run: |
-          pnpm exec electron-forge package --platform=darwin --arch=arm64 -- --out=out
-          for attempt in $(seq 1 90); do
-            if [ -d out ] && [ -n "$(find out -mindepth 1 -maxdepth 1 -print -quit)" ]; then
-              find out -maxdepth 3 -print
-              exit 0
-            fi
-            sleep 2
-          done
-          find . -maxdepth 4 \( -name out -o -name '*.app' -o -name 'SlackReplyBoard-darwin-*' \) -print || true
-          find out -maxdepth 3 -print
+        run: node scripts/package-electron-forge.mjs --platform=darwin --arch=arm64 --out=apps/desktop/out
 
       - name: Smoke packaged app
         run: pnpm package:smoke

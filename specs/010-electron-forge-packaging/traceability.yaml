@@ -6,6 +6,7 @@ acceptanceCriteria:
   - AC-PACKAGE-001-03
   - AC-PACKAGE-001-04
   - AC-PACKAGE-001-05
+  - AC-PACKAGE-001-06
 
 tasks:
   - TASK-PACKAGE-001
@@ -13,12 +14,14 @@ tasks:
   - TASK-PACKAGE-003
   - TASK-PACKAGE-004
   - TASK-PACKAGE-005
+  - TASK-PACKAGE-006
 
 tests:
   - TEST-PACKAGE-CONTRACT-001
   - TEST-PACKAGE-CONTRACT-002
   - TEST-PACKAGE-CONTRACT-003
   - TEST-PACKAGE-CONTRACT-004
+  - TEST-PACKAGE-CONTRACT-005
 
 implementation:
   - .github/workflows/package.yml
@@ -28,3 +31,4 @@ implementation:
   - apps/desktop/vite.preload.config.ts
   - scripts/verify-release.mjs
   - scripts/smoke-macos-app.mjs
+  - scripts/package-electron-forge.mjs

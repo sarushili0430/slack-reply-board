@@ -84,7 +84,7 @@ Target spec:
 - [x] Local Forge Package Smoke
 - [x] Quality
 
-## TASK-PACKAGE-004 Pass Forge arguments through pnpm exec
+## TASK-PACKAGE-004 Pass Forge package arguments directly
 
 Target spec:
 
@@ -99,8 +99,8 @@ Target spec:
 
 ### Green
 
-- [x] Use `pnpm exec electron-forge package` from the desktop workspace in `package.yml`.
-- [x] Use `pnpm exec electron-forge package` from the desktop workspace in `release.yml`.
+- [x] Use the Forge package script from `package.yml`.
+- [x] Use the Forge package script from `release.yml`.
 - [x] Update release verification to reject the extra `--` before Forge platform and architecture
       arguments.
 
@@ -136,6 +136,36 @@ Target spec:
 ### Refactor
 
 - [x] Keep root-level smoke, upload, checksum, SBOM, and release paths on `apps/desktop/out`.
+
+### Verification
+
+- [x] Contract Test
+- [x] Local Forge Package Smoke
+- [x] Quality
+
+## TASK-PACKAGE-006 Verify Forge Core package output
+
+Target spec:
+
+- FR-PACKAGE-001
+- AC-PACKAGE-001-06
+
+### Red
+
+- [x] Add `TEST-PACKAGE-CONTRACT-005`.
+- [x] Confirm the contract fails while no verified Forge Core package script exists.
+
+### Green
+
+- [x] Add `scripts/package-electron-forge.mjs`.
+- [x] Invoke Electron Forge through `@electron-forge/core`.
+- [x] Validate that at least one `.app` bundle exists under `apps/desktop/out`.
+- [x] Support comma-separated release architectures.
+- [x] Update package and release workflows to use the script.
+
+### Refactor
+
+- [x] Keep package output validation in the script instead of shell loops in workflows.
 
 ### Verification
 

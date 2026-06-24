@@ -5,6 +5,7 @@ import { describe, expect, test } from 'vitest';
 const packageWorkflowPath = '.github/workflows/package.yml';
 const releaseWorkflowPath = '.github/workflows/release.yml';
 const forgeConfigPath = 'apps/desktop/forge.config.ts';
+const forgePackageScriptPath = 'scripts/package-electron-forge.mjs';
 
 describe('FR-PACKAGE-001 Electron Forge packaging', () => {
   test('TEST-PACKAGE-CONTRACT-001 AC-PACKAGE-001-01: workflows package desktop through Forge only', async () => {
@@ -15,8 +16,10 @@ describe('FR-PACKAGE-001 Electron Forge packaging', () => {
     ]);
     const workflowText = `${packageWorkflow}\n${releaseWorkflow}`;
 
-    expect(workflowText).toContain('working-directory: apps/desktop');
-    expect(workflowText).toContain('pnpm exec electron-forge package');
+    expect(workflowText).toContain('node scripts/package-electron-forge.mjs');
+    expect(forgeConfig).toContain(
+      "import type { ForgeConfig } from '@electron-forge/shared-types'",
+    );
     expect(workflowText).not.toContain('package -- --platform=darwin');
     expect(workflowText).not.toContain('electron-packager');
 
@@ -52,31 +55,49 @@ describe('FR-PACKAGE-001 Electron Forge packaging', () => {
     ]);
 
     expect(packageWorkflow).toContain(
-      'pnpm exec electron-forge package --platform=darwin --arch=arm64 -- --out=out',
+      'node scripts/package-electron-forge.mjs --platform=darwin --arch=arm64 --out=apps/desktop/out',
     );
     expect(releaseWorkflow).toContain(
-      'pnpm exec electron-forge package --platform=darwin --arch=arm64,x64 -- --out=out',
+      'node scripts/package-electron-forge.mjs --platform=darwin --arch=arm64,x64 --out=apps/desktop/out',
     );
     expect(packageWorkflow).toContain('apps/desktop/out');
     expect(releaseWorkflow).toContain('apps/desktop/out');
-    expect(releaseVerifier).toContain('--out=out');
+    expect(releaseVerifier).toContain('--out=apps/desktop/out');
   });
 
   test('TEST-PACKAGE-CONTRACT-004 AC-PACKAGE-001-05: workflows package from the desktop workspace directory', async () => {
-    const [packageWorkflow, releaseWorkflow] = await Promise.all([
+    const [packageWorkflow, releaseWorkflow, forgePackageScript] = await Promise.all([
       readFile(packageWorkflowPath, 'utf8'),
       readFile(releaseWorkflowPath, 'utf8'),
+      readFile(forgePackageScriptPath, 'utf8'),
     ]);
 
-    expect(packageWorkflow).toContain('working-directory: apps/desktop');
-    expect(releaseWorkflow).toContain('working-directory: apps/desktop');
     expect(packageWorkflow).toContain(
-      'pnpm exec electron-forge package --platform=darwin --arch=arm64 -- --out=out',
+      'node scripts/package-electron-forge.mjs --platform=darwin --arch=arm64 --out=apps/desktop/out',
     );
     expect(releaseWorkflow).toContain(
-      'pnpm exec electron-forge package --platform=darwin --arch=arm64,x64 -- --out=out',
+      'node scripts/package-electron-forge.mjs --platform=darwin --arch=arm64,x64 --out=apps/desktop/out',
     );
-    expect(packageWorkflow).toContain('if [ -d out ]');
-    expect(releaseWorkflow).toContain('if [ -d out ]');
+    expect(forgePackageScript).toContain('process.chdir(appDir)');
+    expect(forgePackageScript).toContain('outDir');
+  });
+
+  test('TEST-PACKAGE-CONTRACT-005 AC-PACKAGE-001-06: workflows package through a verified Forge Core script', async () => {
+    const [packageWorkflow, releaseWorkflow, forgePackageScript] = await Promise.all([
+      readFile(packageWorkflowPath, 'utf8'),
+      readFile(releaseWorkflowPath, 'utf8'),
+      readFile(forgePackageScriptPath, 'utf8'),
+    ]);
+
+    expect(packageWorkflow).toContain(
+      'node scripts/package-electron-forge.mjs --platform=darwin --arch=arm64 --out=apps/desktop/out',
+    );
+    expect(releaseWorkflow).toContain(
+      'node scripts/package-electron-forge.mjs --platform=darwin --arch=arm64,x64 --out=apps/desktop/out',
+    );
+    expect(forgePackageScript).toContain("await import('@electron-forge/core')");
+    expect(forgePackageScript).toContain('await api.package');
+    expect(forgePackageScript).toContain('process.chdir(appDir)');
+    expect(forgePackageScript).toContain('No .app bundle found');
   });
 });

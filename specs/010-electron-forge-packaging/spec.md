@@ -63,7 +63,7 @@ Then:
 
 Given:
 
-- Package and release workflows invoke Electron Forge through pnpm.
+- Package and release workflows invoke Electron Forge through the repository packaging script.
 
 When:
 
@@ -71,9 +71,9 @@ When:
 
 Then:
 
-- Workflows use `pnpm exec electron-forge package`.
-- Workflows pass `--platform` and `--arch` directly to Forge.
-- Workflows pass packager-only `--out=out` after Forge's `--` argument separator.
+- Workflows pass `--platform` and `--arch` directly to the packaging script.
+- Workflows pass `--out=apps/desktop/out` directly to the packaging script.
+- The packaging script passes platform, architecture, and outDir to Electron Forge Core API.
 
 ### AC-PACKAGE-001-05 Package workflows run from the desktop workspace directory
 
@@ -88,10 +88,28 @@ When:
 
 Then:
 
-- The packaging step uses `working-directory: apps/desktop`.
-- The packaging command uses `pnpm exec electron-forge package`.
-- The packaging step waits for the relative `out` directory from `apps/desktop`.
+- The packaging script changes the process working directory to `apps/desktop` before invoking Forge.
+- The packaging script uses the absolute app directory as the Forge `dir`.
+- The packaging script waits for and validates `.app` bundles under `apps/desktop/out`.
 - The root-level smoke and upload steps continue to consume `apps/desktop/out`.
+
+### AC-PACKAGE-001-06 Package workflows verify Forge Core output
+
+Given:
+
+- Package and release workflows invoke Electron Forge on macOS CI.
+
+When:
+
+- Forge packaging returns successfully.
+
+Then:
+
+- Workflows invoke `scripts/package-electron-forge.mjs`.
+- The script imports `@electron-forge/core`.
+- The script calls `api.package`.
+- The script fails if no `.app` bundle exists under `apps/desktop/out`.
+- The release workflow packages both `arm64` and `x64` architectures.
 
 ## Security Impact
 
