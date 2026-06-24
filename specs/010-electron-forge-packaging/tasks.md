@@ -172,3 +172,32 @@ Target spec:
 - [x] Contract Test
 - [x] Local Forge Package Smoke
 - [x] Quality
+
+## TASK-PACKAGE-007 Isolate Forge packaging Node runtime
+
+Target spec:
+
+- FR-PACKAGE-001
+- AC-PACKAGE-001-07
+
+### Red
+
+- [x] Add `TEST-PACKAGE-CONTRACT-006`.
+- [x] Confirm package and release workflows do not isolate the Forge packaging runtime.
+
+### Green
+
+- [x] Add a package workflow Node setup step scoped before Forge packaging.
+- [x] Add a release workflow Node setup step scoped before Forge packaging.
+- [x] Keep install and quality gates on `.node-version`.
+- [x] Update release verification to require the compatibility runtime step.
+
+### Refactor
+
+- [x] Keep the compatibility runtime visible and named for later removal.
+
+### Verification
+
+- [x] Contract Test
+- [x] Local Forge Package Smoke
+- [x] Quality

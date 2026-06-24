@@ -100,4 +100,24 @@ describe('FR-PACKAGE-001 Electron Forge packaging', () => {
     expect(forgePackageScript).toContain('process.chdir(appDir)');
     expect(forgePackageScript).toContain('No .app bundle found');
   });
+
+  test('TEST-PACKAGE-CONTRACT-006 AC-PACKAGE-001-07: workflows isolate the Forge packaging Node runtime', async () => {
+    const [packageWorkflow, releaseWorkflow, releaseVerifier] = await Promise.all([
+      readFile(packageWorkflowPath, 'utf8'),
+      readFile(releaseWorkflowPath, 'utf8'),
+      readFile('scripts/verify-release.mjs', 'utf8'),
+    ]);
+
+    expect(packageWorkflow).toContain('name: Setup Forge packaging Node.js');
+    expect(releaseWorkflow).toContain('name: Setup Forge packaging Node.js');
+    expect(packageWorkflow).toContain('node-version: 24.2.0');
+    expect(releaseWorkflow).toContain('node-version: 24.2.0');
+    expect(packageWorkflow.indexOf('name: Setup Forge packaging Node.js')).toBeLessThan(
+      packageWorkflow.indexOf('node scripts/package-electron-forge.mjs'),
+    );
+    expect(releaseWorkflow.indexOf('name: Setup Forge packaging Node.js')).toBeLessThan(
+      releaseWorkflow.indexOf('node scripts/package-electron-forge.mjs'),
+    );
+    expect(releaseVerifier).toContain('Setup Forge packaging Node.js');
+  });
 });

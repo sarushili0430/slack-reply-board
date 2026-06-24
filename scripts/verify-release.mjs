@@ -47,6 +47,15 @@ if (!packagingWorkflowText.includes('node scripts/package-electron-forge.mjs')) 
   errors.push('package and release workflows must invoke the Forge packaging script');
 }
 
+if (
+  !packageWorkflowText.includes('Setup Forge packaging Node.js') ||
+  !workflowText.includes('Setup Forge packaging Node.js') ||
+  !packageWorkflowText.includes('node-version: 24.2.0') ||
+  !workflowText.includes('node-version: 24.2.0')
+) {
+  errors.push('package and release workflows must isolate the Forge packaging Node runtime');
+}
+
 if (!forgePackageScriptText.includes("await import('@electron-forge/core')")) {
   errors.push('Forge packaging script must import @electron-forge/core');
 }
