@@ -1,0 +1,20 @@
+requirement: FR-EVAL-001
+
+acceptanceCriteria:
+  - AC-EVAL-001-01
+
+tasks:
+  - TASK-EVAL-001
+
+tests:
+  - TEST-EVAL-CONTRACT-001
+
+implementation:
+  - scripts/check-evals.mjs
+  - package.json
+  - .github/workflows/ci.yml
+  - evals/retrieval/cases.jsonl
+  - evals/retrieval/thresholds.yaml
+  - evals/classification/thresholds.yaml
+  - evals/drafting/thresholds.yaml
+  - evals/grounding/thresholds.yaml
