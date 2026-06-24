@@ -53,3 +53,34 @@ Target spec:
 ### Verification
 
 - [x] Unit Test
+
+## TASK-DAEMON-003 Electron main daemon lifecycle wiring
+
+Target spec:
+
+- FR-DAEMON-001
+- AC-DAEMON-001-01
+- NFR-DAEMON-001
+
+### Red
+
+- [x] Add `TEST-DAEMON-UNIT-003`.
+- [x] Add `TEST-DAEMON-UNIT-004`.
+- [x] Confirm Electron lifecycle does not start or stop the daemon supervisor.
+- [x] Confirm no Node daemon process starter exists.
+
+### Green
+
+- [x] Start the daemon supervisor before creating the first main window.
+- [x] Stop the daemon supervisor when Electron quits.
+- [x] Spawn the daemon entrypoint as a separate Node-compatible process.
+- [x] Add a daemon entrypoint that keeps the daemon runtime alive until shutdown.
+
+### Refactor
+
+- [x] Keep Electron lifecycle hooks separate from child process mechanics.
+
+### Verification
+
+- [x] Unit Test
+- [x] Quality
