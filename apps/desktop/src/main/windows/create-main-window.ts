@@ -1,7 +1,7 @@
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { BrowserWindow } from 'electron';
+import { app, BrowserWindow } from 'electron';
 
 const currentDirectory = dirname(fileURLToPath(import.meta.url));
 
@@ -25,6 +25,7 @@ export async function createMainWindow(): Promise<void> {
   });
 
   registerMainWindowNavigationGuards(mainWindow);
+  registerProductionDevToolsGuard(mainWindow);
 
   if (MAIN_WINDOW_VITE_DEV_SERVER_URL !== undefined) {
     await mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
@@ -34,6 +35,17 @@ export async function createMainWindow(): Promise<void> {
   await mainWindow.loadFile(
     join(currentDirectory, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`),
   );
+}
+
+function registerProductionDevToolsGuard(mainWindow: BrowserWindow): void {
+  if (!app.isPackaged) {
+    return;
+  }
+
+  mainWindow.webContents.closeDevTools();
+  mainWindow.webContents.on('devtools-opened', () => {
+    mainWindow.webContents.closeDevTools();
+  });
 }
 
 function registerMainWindowNavigationGuards(mainWindow: BrowserWindow): void {

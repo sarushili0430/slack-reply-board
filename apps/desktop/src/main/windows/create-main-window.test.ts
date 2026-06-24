@@ -13,6 +13,7 @@ type NavigationEvent = {
   preventDefault(): void;
 };
 type NavigationHandler = (event: NavigationEvent, url: string) => void;
+type DevToolsOpenedHandler = () => void;
 
 class FakeBrowserWindow {
   static instances: FakeBrowserWindow[] = [];
@@ -21,16 +22,23 @@ class FakeBrowserWindow {
   readonly loadURL = vi.fn(() => Promise.resolve());
   readonly once = vi.fn();
   readonly show = vi.fn();
+  readonly closeDevTools = vi.fn();
   readonly webContents = {
     on: vi.fn((eventName: string, handler: NavigationHandler) => {
       if (eventName === 'will-navigate') {
         this.navigationHandler = handler;
       }
+
+      if (eventName === 'devtools-opened') {
+        this.devToolsOpenedHandler = handler as DevToolsOpenedHandler;
+      }
     }),
     setWindowOpenHandler: vi.fn((handler: WindowOpenHandler) => {
       this.windowOpenHandler = handler;
     }),
+    closeDevTools: this.closeDevTools,
   };
+  devToolsOpenedHandler: DevToolsOpenedHandler | null = null;
   navigationHandler: NavigationHandler | null = null;
   windowOpenHandler: WindowOpenHandler | null = null;
 
@@ -59,7 +67,10 @@ describe('FR-ELECTRON-001 Renderer is isolated from Node and arbitrary navigatio
   });
 
   test('TEST-ELECTRON-UNIT-001 / AC-ELECTRON-001-01: main window denies arbitrary renderer navigation', async () => {
-    vi.doMock('electron', () => ({ BrowserWindow: FakeBrowserWindow }));
+    vi.doMock('electron', () => ({
+      app: { isPackaged: true },
+      BrowserWindow: FakeBrowserWindow,
+    }));
 
     const { createMainWindow } = await import('./create-main-window.js');
 
@@ -87,5 +98,26 @@ describe('FR-ELECTRON-001 Renderer is isolated from Node and arbitrary navigatio
     );
 
     expect(fileNavigationEvent.preventDefault).not.toHaveBeenCalled();
+    expect(mainWindow.webContents.closeDevTools).toHaveBeenCalledTimes(1);
+
+    mainWindow.devToolsOpenedHandler?.();
+
+    expect(mainWindow.webContents.closeDevTools).toHaveBeenCalledTimes(2);
+  });
+
+  test('TEST-ELECTRON-UNIT-002 / AC-ELECTRON-002-01: development main window keeps DevTools available', async () => {
+    vi.doMock('electron', () => ({
+      app: { isPackaged: false },
+      BrowserWindow: FakeBrowserWindow,
+    }));
+
+    const { createMainWindow } = await import('./create-main-window.js');
+
+    await createMainWindow();
+
+    const mainWindow = getCreatedWindow();
+
+    expect(mainWindow.webContents.closeDevTools).not.toHaveBeenCalled();
+    expect(mainWindow.devToolsOpenedHandler).toBeNull();
   });
 });
