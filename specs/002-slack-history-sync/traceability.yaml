@@ -3,6 +3,7 @@ requirement: FR-SYNC-001
 acceptanceCriteria:
   - AC-SYNC-001-01
   - AC-SYNC-001-02
+  - AC-SYNC-001-03
 
 tasks:
   - TASK-SYNC-001
@@ -14,6 +15,7 @@ tasks:
   - TASK-SYNC-007
   - TASK-SYNC-008
   - TASK-SYNC-009
+  - TASK-SYNC-010
 
 tests:
   - TEST-SYNC-UNIT-001
@@ -26,7 +28,11 @@ tests:
   - TEST-SYNC-INTEGRATION-004
   - TEST-SYNC-UNIT-003
   - TEST-SYNC-UNIT-004
+  - TEST-SYNC-CONTRACT-003
+  - TEST-SYNC-UNIT-005
+  - TEST-SYNC-INTEGRATION-005
   - TEST-SYNC-ACCEPTANCE-001
+  - TEST-SYNC-ACCEPTANCE-002
 
 implementation:
   - apps/indexer-worker/src/consumers/process-indexing-outbox.ts
@@ -34,5 +40,6 @@ implementation:
   - packages/adapters/sqlite/src/index.ts
   - packages/slack-sync/src/domain/slack-event-id.ts
   - packages/slack-sync/src/application/sync-slack-message.ts
+  - packages/slack-sync/src/application/delete-slack-message.ts
   - packages/slack-sync/src/ports/message-repository.ts
   - packages/contracts/src/events/slack-message-event.ts
