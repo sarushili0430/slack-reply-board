@@ -1,0 +1,14 @@
+requirement: FR-DESKTOP-001
+
+acceptanceCriteria:
+  - AC-DESKTOP-001-01
+
+tasks:
+  - TASK-DESKTOP-001
+
+tests:
+  - TEST-DESKTOP-UNIT-001
+
+implementation:
+  - apps/desktop/src/preload/replyboard-api.ts
+  - apps/desktop/src/preload/index.ts
