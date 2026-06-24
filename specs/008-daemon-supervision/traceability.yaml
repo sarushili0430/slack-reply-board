@@ -1,0 +1,13 @@
+requirement: FR-DAEMON-001
+
+acceptanceCriteria:
+  - AC-DAEMON-001-01
+
+tasks:
+  - TASK-DAEMON-001
+
+tests:
+  - TEST-DAEMON-UNIT-001
+
+implementation:
+  - apps/desktop/src/main/daemon-supervisor/restart-policy.ts
