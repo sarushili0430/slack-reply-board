@@ -2,17 +2,20 @@ requirement: FR-DAEMON-001
 
 acceptanceCriteria:
   - AC-DAEMON-001-01
+  - AC-DAEMON-001-02
 
 tasks:
   - TASK-DAEMON-001
   - TASK-DAEMON-002
   - TASK-DAEMON-003
+  - TASK-DAEMON-004
 
 tests:
   - TEST-DAEMON-UNIT-001
   - TEST-DAEMON-UNIT-002
   - TEST-DAEMON-UNIT-003
   - TEST-DAEMON-UNIT-004
+  - TEST-DAEMON-UNIT-005
 
 implementation:
   - apps/daemon/package.json
@@ -20,6 +23,8 @@ implementation:
   - apps/desktop/src/main/app-lifecycle/register-app-lifecycle.ts
   - apps/desktop/src/main/daemon-supervisor/daemon-supervisor.ts
   - apps/desktop/src/main/daemon-supervisor/create-desktop-daemon-supervisor.ts
+  - apps/desktop/src/main/daemon-supervisor/create-desktop-daemon-supervisor.test.ts
+  - apps/desktop/src/main/daemon-supervisor/daemon-health-client.ts
   - apps/desktop/src/main/daemon-supervisor/node-daemon-process.ts
   - apps/desktop/src/main/daemon-supervisor/restart-policy.ts
   - apps/desktop/src/main/index.ts

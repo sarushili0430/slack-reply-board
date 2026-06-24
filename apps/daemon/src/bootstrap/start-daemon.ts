@@ -26,7 +26,10 @@ export async function startDaemon(options: StartDaemonOptions = {}): Promise<Dae
   let localApiRuntime: LocalApiRuntime | null = null;
 
   try {
-    const sessionToken = options.localApi?.sessionToken ?? createLocalApiSessionToken();
+    const sessionToken =
+      options.localApi?.sessionToken ??
+      process.env.REPLYBOARD_LOCAL_API_SESSION_TOKEN ??
+      createLocalApiSessionToken();
     localApiRuntime = await startLocalApiServer({
       host: options.localApi?.host ?? process.env.REPLYBOARD_LOCAL_API_HOST ?? '127.0.0.1',
       port: options.localApi?.port ?? getLocalApiPort(),

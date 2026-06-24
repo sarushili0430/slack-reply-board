@@ -84,3 +84,31 @@ Target spec:
 
 - [x] Unit Test
 - [x] Quality
+
+## TASK-DAEMON-004 Local API handoff for daemon health checks
+
+Target spec:
+
+- FR-DAEMON-001
+- AC-DAEMON-001-02
+
+### Red
+
+- [x] Add `TEST-DAEMON-UNIT-005`.
+- [x] Confirm desktop daemon process creation does not pass local API connection settings.
+
+### Green
+
+- [x] Generate or accept a desktop-owned local API session token.
+- [x] Pass local API host, port, and token to the daemon process environment.
+- [x] Expose the matching local API connection to Electron main code.
+- [x] Make daemon startup honor the passed session token.
+
+### Refactor
+
+- [x] Keep local API handoff separate from restart policy mechanics.
+
+### Verification
+
+- [x] Unit Test
+- [x] Quality

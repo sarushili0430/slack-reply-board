@@ -23,6 +23,23 @@ Then:
 - The fourth unexpected exit stops automatic restart.
 - An expected shutdown does not request a restart.
 
+### AC-DAEMON-001-02 Desktop hands local API connection settings to daemon
+
+Given:
+
+- The Electron main process starts the daemon as a separate process.
+- The desktop main process owns the local API session token.
+
+When:
+
+- The daemon process is spawned.
+
+Then:
+
+- The daemon receives the local API host, port, and session token through process environment.
+- The desktop main process keeps the matching local API origin and session token for health checks.
+- The session token is not exposed to the Renderer.
+
 ## Non-Functional Requirements
 
 ### NFR-DAEMON-001 Restart ceiling

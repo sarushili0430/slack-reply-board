@@ -13,6 +13,7 @@ tests:
   - TEST-LOCAL-INTEGRATION-001
   - TEST-LOCAL-INTEGRATION-002
   - TEST-LOCAL-INTEGRATION-003
+  - TEST-LOCAL-INTEGRATION-004
 
 implementation:
   - apps/daemon/src/local-api/session-token.ts
