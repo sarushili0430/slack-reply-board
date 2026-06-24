@@ -52,3 +52,29 @@ Target spec:
 ### Verification
 
 - [x] Unit Test
+
+## TASK-SYNC-003 Slack Event Callback契約変換
+
+Target spec:
+
+- FR-SYNC-001
+- AC-SYNC-001-01
+
+### Red
+
+- [x] Add `TEST-SYNC-CONTRACT-001`.
+- [x] Confirm raw Slack `event_callback` payload is not converted before adapter mapping exists.
+
+### Green
+
+- [x] Validate raw Slack `event_callback` payload with Runtime Schema.
+- [x] Map Slack `event_id`, `team_id`, `channel`, `ts`, `thread_ts`, `text`, and `event_time` to the internal Message Event Contract.
+- [x] Reject payloads missing required Slack identifiers.
+
+### Refactor
+
+- [x] Keep Slack raw payload shape inside the Slack adapter.
+
+### Verification
+
+- [x] Contract Test

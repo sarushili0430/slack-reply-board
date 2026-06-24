@@ -7,13 +7,17 @@ acceptanceCriteria:
 tasks:
   - TASK-SYNC-001
   - TASK-SYNC-002
+  - TASK-SYNC-003
 
 tests:
   - TEST-SYNC-UNIT-001
   - TEST-SYNC-UNIT-002
+  - TEST-SYNC-CONTRACT-001
+  - TEST-SYNC-CONTRACT-002
   - TEST-SYNC-ACCEPTANCE-001
 
 implementation:
+  - packages/adapters/slack/src/index.ts
   - packages/slack-sync/src/domain/slack-event-id.ts
   - packages/slack-sync/src/application/sync-slack-message.ts
   - packages/slack-sync/src/ports/message-repository.ts

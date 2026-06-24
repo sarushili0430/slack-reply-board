@@ -16,6 +16,7 @@
     "test:coverage": "vitest run --coverage --passWithNoTests"
   },
   "dependencies": {
-    "@replyboard/contracts": "workspace:*"
+    "@replyboard/contracts": "workspace:*",
+    "zod": "4.4.3"
   }
 }
