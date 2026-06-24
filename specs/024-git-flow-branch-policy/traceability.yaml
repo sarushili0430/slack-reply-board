@@ -1,0 +1,18 @@
+requirement: FR-GITFLOW-001
+
+acceptanceCriteria:
+  - AC-GITFLOW-001-01
+  - AC-GITFLOW-001-02
+
+tasks:
+  - TASK-GITFLOW-001
+
+tests:
+  - TEST-GITFLOW-CONTRACT-001
+
+implementation:
+  - scripts/check-git-flow-ref.mjs
+  - package.json
+  - .github/workflows/ci.yml
+  - .github/workflows/package.yml
+  - .github/workflows/release.yml
