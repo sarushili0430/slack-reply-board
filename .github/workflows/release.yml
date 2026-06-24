@@ -125,6 +125,9 @@ jobs:
           done
           find apps/desktop/out -maxdepth 3 -print
 
+      - name: Generate SBOM
+        run: node scripts/generate-sbom.mjs apps/desktop/out/sbom.spdx.json
+
       - name: Generate checksums
         run: >
           find apps/desktop/out -maxdepth 3 -type f -print0 |
