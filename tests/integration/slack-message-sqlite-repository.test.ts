@@ -4,7 +4,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, test } from 'vitest';
 
-import { SqliteMessageRepository } from '@replyboard/adapters-sqlite';
+import { SqliteMessageRepository, SqliteOutboxRepository } from '@replyboard/adapters-sqlite';
 import { createSlackEventId, type SyncedSlackMessage } from '@replyboard/slack-sync';
 
 type StoredMessageRow = {
@@ -104,6 +104,59 @@ describe('FR-SYNC-001 Slack履歴の差分同期', () => {
       }
     } finally {
       repository.close();
+      await rm(temporaryDirectory, { recursive: true, force: true });
+    }
+  });
+
+  test('TEST-SYNC-INTEGRATION-003 / NFR-SYNC-004: SQLite outboxはat-least-once claimとidempotency keyを提供する', async () => {
+    const temporaryDirectory = await mkdtemp(join(tmpdir(), 'replyboard-sqlite-'));
+    const databasePath = join(temporaryDirectory, 'messages.sqlite');
+    let now = new Date('2026-06-23T10:00:00.000Z');
+    const messageRepository = new SqliteMessageRepository({ databasePath });
+    const outboxRepository = new SqliteOutboxRepository({
+      databasePath,
+      lockDurationMs: 60_000,
+      now: () => now,
+    });
+
+    try {
+      await messageRepository.saveMessage(createMessage('Ev-integration-3', 'claim body'));
+
+      const firstClaim = await outboxRepository.claimPendingEvents(10);
+      const secondClaim = await outboxRepository.claimPendingEvents(10);
+
+      expect(firstClaim).toEqual([
+        {
+          id: 'slack-message-index:Ev-integration-3',
+          eventId: 'Ev-integration-3',
+          eventType: 'slack_message.index_requested',
+          idempotencyKey: 'slack-message-index:Ev-integration-3',
+          payload: {
+            eventId: 'Ev-integration-3',
+            workspaceId: 'T-integration',
+            channelId: 'C-integration',
+            messageTs: '1710000000.000500',
+          },
+          attemptCount: 1,
+        },
+      ]);
+      expect(secondClaim).toEqual([]);
+
+      now = new Date('2026-06-23T10:01:01.000Z');
+      expect(await outboxRepository.claimPendingEvents(10)).toEqual([
+        expect.objectContaining({
+          id: 'slack-message-index:Ev-integration-3',
+          attemptCount: 2,
+          idempotencyKey: 'slack-message-index:Ev-integration-3',
+        }),
+      ]);
+
+      await outboxRepository.markProcessed('slack-message-index:Ev-integration-3');
+
+      expect(await outboxRepository.claimPendingEvents(10)).toEqual([]);
+    } finally {
+      outboxRepository.close();
+      messageRepository.close();
       await rm(temporaryDirectory, { recursive: true, force: true });
     }
   });

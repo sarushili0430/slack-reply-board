@@ -57,6 +57,11 @@ New messages must become searchable within p95 30 seconds after event receipt.
 Persisting a new Slack message and enqueueing the indexing job must happen in the same SQLite
 transaction or through an outbox table protected by the same write boundary.
 
+### NFR-SYNC-004 At-least-once outbox processing
+
+Outbox events must be claimable with an idempotency key, retried at least once after lock expiry,
+and hidden from further claims after successful processing.
+
 ## Security Impact
 
 - Slack tokens must stay behind the Slack adapter and Keychain adapter.

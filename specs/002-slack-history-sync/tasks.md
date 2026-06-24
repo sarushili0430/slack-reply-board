@@ -159,3 +159,30 @@ Target spec:
 ### Verification
 
 - [x] SQLite Integration Test
+
+## TASK-SYNC-007 SQLite outbox claim lifecycle
+
+Target spec:
+
+- FR-SYNC-001
+- NFR-SYNC-004
+
+### Red
+
+- [x] Add `TEST-SYNC-INTEGRATION-003`.
+- [x] Confirm SQLite outbox has no claim lifecycle repository.
+
+### Green
+
+- [x] Add `SqliteOutboxRepository`.
+- [x] Return a stable idempotency key for claimed events.
+- [x] Lock claimed events until the claim timeout.
+- [x] Mark processed events so they are not claimed again.
+
+### Refactor
+
+- [x] Keep outbox lifecycle storage inside the SQLite adapter.
+
+### Verification
+
+- [x] SQLite Integration Test
