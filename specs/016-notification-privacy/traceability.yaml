@@ -1,0 +1,14 @@
+requirement: FR-DESKTOP-002
+
+acceptanceCriteria:
+  - AC-DESKTOP-002-01
+  - AC-DESKTOP-002-02
+
+tasks:
+  - TASK-DESKTOP-002
+
+tests:
+  - TEST-DESKTOP-UNIT-002
+
+implementation:
+  - apps/desktop/src/main/notifications/notification-content.ts
