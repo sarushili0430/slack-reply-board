@@ -1,3 +1,5 @@
+import { completeSlackOAuth } from '@replyboard/slack-sync';
+
 import { createCompositionRoot } from '../composition-root/create-composition-root.js';
 import { startLocalApiServer, type LocalApiRuntime } from '../local-api/local-api-server.js';
 import { createLocalApiSessionToken } from '../local-api/session-token.js';
@@ -31,6 +33,11 @@ export async function startDaemon(options: StartDaemonOptions = {}): Promise<Dae
       process.env.REPLYBOARD_LOCAL_API_SESSION_TOKEN ??
       createLocalApiSessionToken();
     localApiRuntime = await startLocalApiServer({
+      completeSlackOAuth: (request) =>
+        completeSlackOAuth({
+          ...request,
+          tokenStore: compositionRoot.slackTokenStore,
+        }),
       host: options.localApi?.host ?? process.env.REPLYBOARD_LOCAL_API_HOST ?? '127.0.0.1',
       port: options.localApi?.port ?? getLocalApiPort(),
       sessionToken,

@@ -24,6 +24,36 @@ Target spec:
 
 - [x] Unit Test
 
+## TASK-OAUTH-003 Complete OAuth through daemon application boundary
+
+Target spec:
+
+- FR-OAUTH-001
+- AC-OAUTH-001-02
+
+### Red
+
+- [x] Add `TEST-OAUTH-UNIT-003`.
+- [x] Add `TEST-OAUTH-INTEGRATION-001` and `TEST-OAUTH-INTEGRATION-002`.
+- [x] Confirm no application use case stores the OAuth access token through a token store port.
+
+### Green
+
+- [x] Add Runtime Schema for the daemon OAuth completion request and response.
+- [x] Add a Slack token store port.
+- [x] Add a use case that stores the token and returns only a token reference.
+- [x] Add a session-protected daemon local API route for OAuth completion.
+
+### Refactor
+
+- [x] Keep raw token handling inside daemon/application and adapter boundaries.
+
+### Verification
+
+- [x] Unit Test
+- [x] Integration Test
+- [x] Quality
+
 ## TASK-OAUTH-002 OS Keychain token store
 
 Target spec:

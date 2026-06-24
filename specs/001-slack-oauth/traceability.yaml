@@ -2,14 +2,25 @@ requirement: FR-OAUTH-001
 
 acceptanceCriteria:
   - AC-OAUTH-001-01
+  - AC-OAUTH-001-02
 
 tasks:
   - TASK-OAUTH-001
   - TASK-OAUTH-002
+  - TASK-OAUTH-003
 
 tests:
   - TEST-OAUTH-UNIT-001
   - TEST-OAUTH-UNIT-002
+  - TEST-OAUTH-UNIT-003
+  - TEST-OAUTH-INTEGRATION-001
+  - TEST-OAUTH-INTEGRATION-002
 
 implementation:
+  - apps/daemon/src/bootstrap/start-daemon.ts
+  - apps/daemon/src/composition-root/create-composition-root.ts
+  - apps/daemon/src/local-api/local-api-server.ts
+  - packages/contracts/src/local-api/slack-oauth.ts
+  - packages/slack-sync/src/application/complete-slack-oauth.ts
+  - packages/slack-sync/src/ports/slack-token-store.ts
   - packages/adapters/keychain/src/index.ts
