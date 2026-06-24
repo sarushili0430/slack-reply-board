@@ -1,0 +1,16 @@
+requirement: FR-LICENSE-001
+
+acceptanceCriteria:
+  - AC-LICENSE-001-01
+
+tasks:
+  - TASK-LICENSE-001
+
+tests:
+  - TEST-LICENSE-CONTRACT-001
+
+implementation:
+  - scripts/check-license-policy.mjs
+  - package.json
+  - .github/workflows/security.yml
+  - docs/supply-chain/github-actions.md
