@@ -18,5 +18,8 @@
   "dependencies": {
     "@replyboard/slack-sync": "workspace:*",
     "better-sqlite3": "12.11.1"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "7.6.13"
   }
 }

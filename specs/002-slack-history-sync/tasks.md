@@ -78,3 +78,30 @@ Target spec:
 ### Verification
 
 - [x] Contract Test
+
+## TASK-SYNC-004 SQLite Raw Message Store一意制約
+
+Target spec:
+
+- FR-SYNC-001
+- AC-SYNC-001-01
+
+### Red
+
+- [x] Add `TEST-SYNC-INTEGRATION-001`.
+- [x] Confirm duplicate `event_id` persistence fails before SQLite storage exists.
+
+### Green
+
+- [x] Create the Slack message table in SQLite.
+- [x] Enable WAL mode for the database connection.
+- [x] Persist messages with a unique `event_id`.
+- [x] Preserve the first stored row when the same event is saved twice.
+
+### Refactor
+
+- [x] Keep SQLite schema details inside the adapter package.
+
+### Verification
+
+- [x] SQLite Integration Test
