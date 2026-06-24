@@ -1,5 +1,9 @@
+import { join } from 'node:path';
+
 import type { ForgeConfig } from '@electron-forge/shared-types';
 import { VitePlugin } from '@electron-forge/plugin-vite';
+
+const projectDir = import.meta.dirname;
 
 const config: ForgeConfig = {
   packagerConfig: {
@@ -11,20 +15,20 @@ const config: ForgeConfig = {
     new VitePlugin({
       build: [
         {
-          entry: 'src/main/index.ts',
-          config: 'vite.main.config.ts',
+          entry: join(projectDir, 'src/main/index.ts'),
+          config: join(projectDir, 'vite.main.config.ts'),
           target: 'main',
         },
         {
-          entry: 'src/preload/index.ts',
-          config: 'vite.preload.config.ts',
+          entry: join(projectDir, 'src/preload/index.ts'),
+          config: join(projectDir, 'vite.preload.config.ts'),
           target: 'preload',
         },
       ],
       renderer: [
         {
           name: 'main_window',
-          config: 'vite.renderer.config.ts',
+          config: join(projectDir, 'vite.renderer.config.ts'),
         },
       ],
     }),
