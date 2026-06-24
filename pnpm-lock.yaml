@@ -109,12 +109,18 @@ importers:
 
   apps/daemon:
     dependencies:
+      '@replyboard/adapters-keychain':
+        specifier: workspace:*
+        version: link:../../packages/adapters/keychain
       '@replyboard/adapters-sqlite':
         specifier: workspace:*
         version: link:../../packages/adapters/sqlite
       '@replyboard/contracts':
         specifier: workspace:*
         version: link:../../packages/contracts
+      '@replyboard/slack-sync':
+        specifier: workspace:*
+        version: link:../../packages/slack-sync
 
   apps/desktop:
     dependencies:

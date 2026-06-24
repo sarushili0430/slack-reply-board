@@ -17,7 +17,9 @@
     "test:coverage": "vitest run --coverage --passWithNoTests"
   },
   "dependencies": {
+    "@replyboard/adapters-keychain": "workspace:*",
     "@replyboard/adapters-sqlite": "workspace:*",
-    "@replyboard/contracts": "workspace:*"
+    "@replyboard/contracts": "workspace:*",
+    "@replyboard/slack-sync": "workspace:*"
   }
 }
