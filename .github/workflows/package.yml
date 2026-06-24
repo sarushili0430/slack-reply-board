@@ -32,12 +32,16 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Package Electron app
-        env:
-          ELECTRON_PACKAGE_ARCH: arm64
-          ELECTRON_PACKAGE_PLATFORM: darwin
         run: |
           pnpm --filter @replyboard/desktop build
-          node scripts/package-electron.mjs
+          pnpm exec electron-packager apps/desktop SlackReplyBoard \
+            --out apps/desktop/out \
+            --overwrite \
+            --asar \
+            --platform=darwin \
+            --arch=arm64 \
+            --ignore='^/(coverage|dist|node_modules|out|src)(/|$)'
+          find apps/desktop/out -maxdepth 3 -print
 
       - name: Upload artifact
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2

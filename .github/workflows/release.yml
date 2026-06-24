@@ -68,11 +68,16 @@ jobs:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-          ELECTRON_PACKAGE_ARCHES: arm64,x64
-          ELECTRON_PACKAGE_PLATFORM: darwin
         run: |
           pnpm --filter @replyboard/desktop build
-          node scripts/package-electron.mjs
+          pnpm exec electron-packager apps/desktop SlackReplyBoard \
+            --out apps/desktop/out \
+            --overwrite \
+            --asar \
+            --platform=darwin \
+            --arch=arm64,x64 \
+            --ignore='^/(coverage|dist|node_modules|out|src)(/|$)'
+          find apps/desktop/out -maxdepth 3 -print
 
       - name: Generate checksums
         run: >
