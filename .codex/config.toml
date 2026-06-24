@@ -1,0 +1,14 @@
+[project]
+name = "slack-reply-board"
+default_branch = "main"
+
+[workflow]
+implementation_mode = "tdd-sdd"
+task_granularity = "one-acceptance-criterion"
+
+[commands]
+quality = "pnpm quality"
+fast_quality = "pnpm quality:fast"
+unit = "pnpm test:unit"
+architecture = "pnpm architecture:check"
+

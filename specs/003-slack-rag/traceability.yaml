@@ -1,0 +1,12 @@
+requirement: FR-RAG-001
+
+acceptanceCriteria:
+  - AC-RAG-001-01
+
+tasks: []
+
+tests:
+  - TEST-RAG-UNIT-001
+
+implementation:
+  - packages/knowledge/src/application/permission-filter.ts

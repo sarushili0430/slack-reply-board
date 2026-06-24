@@ -1,0 +1,34 @@
+packages:
+  - apps/*
+  - packages/*
+  - packages/adapters/*
+
+nodeVersion: 24.17.0
+engineStrict: true
+
+minimumReleaseAge: 1440
+minimumReleaseAgeStrict: true
+minimumReleaseAgeIgnoreMissingTime: false
+
+trustPolicy: no-downgrade
+trustLockfile: false
+blockExoticSubdeps: true
+strictDepBuilds: true
+
+allowBuilds:
+  electron: true
+  esbuild: true
+  lefthook: true
+  better-sqlite3: true
+
+onlyBuiltDependencies:
+  - electron
+  - esbuild
+  - lefthook
+  - better-sqlite3
+
+overrides:
+  semver: 7.8.5
+  '@electron/node-gyp': 10.2.0-electron.2
+  '@types/node': 24.13.2
+  undici-types: 8.5.0

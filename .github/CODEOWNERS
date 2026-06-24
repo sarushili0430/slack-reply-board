@@ -1,0 +1,8 @@
+* @sarushili0430
+
+.github/workflows/** @sarushili0430
+pnpm-lock.yaml @sarushili0430
+packages/adapters/slack/** @sarushili0430
+packages/adapters/keychain/** @sarushili0430
+docs/threat-model/** @sarushili0430
+

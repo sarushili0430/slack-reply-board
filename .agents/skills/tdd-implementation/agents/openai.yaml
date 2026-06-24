@@ -1,0 +1,4 @@
+interface:
+  display_name: 'TDD Implementation'
+  short_description: 'Implement tasks through Red Green Refactor'
+  default_prompt: 'Use $tdd-implementation to implement one traced task with Red, Green, Refactor.'

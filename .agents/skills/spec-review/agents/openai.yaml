@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Spec Review'
+  short_description: 'Review SDD specs for readiness and traceability'
+  default_prompt: 'Use $spec-review to review a feature spec before implementation.'

@@ -1,0 +1,12 @@
+requirement: FR-DRAFT-001
+
+acceptanceCriteria:
+  - AC-DRAFT-001-01
+
+tasks: []
+
+tests:
+  - TEST-DRAFT-UNIT-001
+
+implementation:
+  - packages/drafting/src/domain/draft-version.ts

@@ -1,0 +1,8 @@
+{
+  "extends": "../../packages/typescript-config/renderer.json",
+  "compilerOptions": {
+    "rootDir": "src/renderer"
+  },
+  "include": ["src/renderer/**/*.ts", "src/renderer/**/*.tsx"],
+  "exclude": ["dist", "coverage", ".vite"]
+}

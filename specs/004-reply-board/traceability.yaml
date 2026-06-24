@@ -1,0 +1,15 @@
+requirement: FR-BOARD-001
+
+acceptanceCriteria:
+  - AC-BOARD-001-01
+  - AC-BOARD-001-02
+
+tasks:
+  - TASK-BOARD-001
+
+tests:
+  - TEST-BOARD-UNIT-001
+  - TEST-BOARD-UNIT-002
+
+implementation:
+  - packages/board/src/domain/card.ts

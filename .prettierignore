@@ -1,0 +1,14 @@
+node_modules
+dist
+out
+coverage
+.vite
+generated
+models
+data
+vector-data
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+pnpm-lock.yaml
+

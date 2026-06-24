@@ -1,0 +1,19 @@
+min_version: 2.0.0
+
+pre-commit:
+  piped: true
+  commands:
+    format:
+      glob: '*.{ts,tsx,mts,cts,js,mjs,cjs,json,jsonc,yaml,yml,md,css,scss}'
+      run: pnpm exec prettier --write {staged_files}
+      stage_fixed: true
+
+    lint:
+      glob: '*.{ts,tsx,mts,cts,js,mjs,cjs}'
+      run: pnpm exec eslint --fix --max-warnings=0 {staged_files}
+      stage_fixed: true
+
+pre-push:
+  commands:
+    verify:
+      run: pnpm quality:fast

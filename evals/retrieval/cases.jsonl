@@ -1,0 +1,2 @@
+{"caseId":"RAG-001","query":"Project Aのリリース予定日は？","expectedThreadIds":["C001:1234567890.000100"],"forbiddenThreadIds":["C-HR:1234567890.000200"]}
+

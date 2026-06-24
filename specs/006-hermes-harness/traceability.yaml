@@ -1,0 +1,13 @@
+requirement: FR-HERMES-001
+
+acceptanceCriteria:
+  - AC-HERMES-001-01
+
+tasks: []
+
+tests:
+  - TEST-HERMES-UNIT-001
+
+implementation:
+  - packages/hermes-harness/src/policies/allowed-tools.ts
+  - apps/hermes-mcp/src/tools/list-tools.ts

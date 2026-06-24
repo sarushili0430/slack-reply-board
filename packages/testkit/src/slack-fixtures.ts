@@ -1,0 +1,15 @@
+import type { SlackMessageEventContract } from '@replyboard/contracts';
+
+export function createSlackMessageEvent(
+  overrides: Partial<SlackMessageEventContract> = {},
+): SlackMessageEventContract {
+  return {
+    eventId: 'Evfixture',
+    workspaceId: 'Tfixture',
+    channelId: 'Cfixture',
+    messageTs: '1710000000.000100',
+    text: 'fixture message',
+    eventTime: '2026-06-23T10:00:00.000Z',
+    ...overrides,
+  };
+}
