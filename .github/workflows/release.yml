@@ -111,6 +111,11 @@ jobs:
             "$KEYCHAIN_PATH"
           security find-identity -v -p codesigning "$KEYCHAIN_PATH"
 
+      - name: Setup Forge packaging Node.js
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: 24.2.0
+
       - name: Package Electron app
         env:
           APPLE_ID: ${{ secrets.APPLE_ID }}

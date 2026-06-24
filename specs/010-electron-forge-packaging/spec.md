@@ -111,6 +111,24 @@ Then:
 - The script fails if no `.app` bundle exists under `apps/desktop/out`.
 - The release workflow packages both `arm64` and `x64` architectures.
 
+### AC-PACKAGE-001-07 Package workflows isolate the Forge packaging Node runtime
+
+Given:
+
+- The repository default Node.js version remains `.node-version`.
+- Electron Forge 7.11.2 package hooks do not complete on Node.js 24.17.0 in macOS CI.
+
+When:
+
+- Package and release workflows run Electron Forge packaging.
+
+Then:
+
+- Workflows run install, Git flow checks, and quality gates with `.node-version`.
+- Workflows switch to Node.js 24.2.0 only immediately before the Forge package script.
+- The Forge compatibility runtime step is named `Setup Forge packaging Node.js`.
+- The compatibility runtime step is temporary and scoped to package/release workflows only.
+
 ## Security Impact
 
 - Release signing and notarization secrets remain provided by the protected `release` environment.

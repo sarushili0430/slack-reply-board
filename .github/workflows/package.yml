@@ -36,6 +36,11 @@ jobs:
       - name: Check Git flow ref
         run: pnpm gitflow:check
 
+      - name: Setup Forge packaging Node.js
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: 24.2.0
+
       - name: Package Electron app
         run: node scripts/package-electron-forge.mjs --platform=darwin --arch=arm64 --out=apps/desktop/out
 
