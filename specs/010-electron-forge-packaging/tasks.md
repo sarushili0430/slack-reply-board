@@ -201,3 +201,35 @@ Target spec:
 - [x] Contract Test
 - [x] Local Forge Package Smoke
 - [x] Quality
+
+## TASK-PACKAGE-008 Stabilize packaged app smoke on macOS CI
+
+Target spec:
+
+- FR-PACKAGE-001
+- AC-PACKAGE-001-02
+
+### Red
+
+- [x] Update `TEST-PACKAGE-CONTRACT-002`.
+- [x] Add `TEST-PACKAGE-UNIT-001`.
+- [x] Confirm packaged app smoke still depends on Playwright Electron attach.
+
+### Green
+
+- [x] Launch the packaged `.app` executable as a process.
+- [x] Add a package smoke readiness marker after Electron lifecycle startup.
+- [x] Use a smoke daemon entrypoint that writes a daemon-started marker.
+- [x] Quit the packaged app after readiness during package smoke.
+
+### Refactor
+
+- [x] Keep Renderer behavior coverage in Electron E2E and package smoke coverage at process level.
+
+### Verification
+
+- [x] Contract Test
+- [x] Unit Test
+- [x] Local Forge Package Smoke
+- [x] Lint
+- [x] Typecheck
