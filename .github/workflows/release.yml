@@ -68,20 +68,9 @@ jobs:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-        working-directory: apps/desktop
-        run: pnpm exec electron-forge package
-
-      - name: Wait for package output
-        run: |
-          for attempt in $(seq 1 30); do
-            if [ -d apps/desktop/out ] && [ -n "$(find apps/desktop/out -mindepth 1 -maxdepth 1 -print -quit)" ]; then
-              find apps/desktop/out -maxdepth 3 -print
-              exit 0
-            fi
-            sleep 1
-          done
-          find apps/desktop -maxdepth 3 -print
-          exit 1
+          FORGE_ARCHES: arm64,x64
+          FORGE_PLATFORM: darwin
+        run: node scripts/package-electron-forge.mjs
 
       - name: Generate checksums
         run: >
