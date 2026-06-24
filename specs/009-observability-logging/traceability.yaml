@@ -1,0 +1,13 @@
+requirement: FR-OBS-001
+
+acceptanceCriteria:
+  - AC-OBS-001-01
+
+tasks:
+  - TASK-OBS-001
+
+tests:
+  - TEST-OBS-UNIT-001
+
+implementation:
+  - packages/observability/src/redaction.ts
