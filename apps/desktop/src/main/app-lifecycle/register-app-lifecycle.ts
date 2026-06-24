@@ -1,17 +1,30 @@
 import { app } from 'electron';
 
-export function registerAppLifecycle(createMainWindow: () => Promise<void>): void {
+export type RegisterAppLifecycleOptions = {
+  readonly createMainWindow: () => Promise<void>;
+  readonly startDaemon?: () => Promise<void>;
+  readonly stopDaemon?: () => Promise<void>;
+};
+
+export function registerAppLifecycle(options: RegisterAppLifecycleOptions): void {
   app
     .whenReady()
-    .then(createMainWindow)
+    .then(async () => {
+      await options.startDaemon?.();
+      await options.createMainWindow();
+    })
     .catch((error: unknown) => {
       throw error;
     });
 
   app.on('activate', () => {
     if (app.isReady()) {
-      void createMainWindow();
+      void options.createMainWindow();
     }
+  });
+
+  app.on('before-quit', () => {
+    void options.stopDaemon?.();
   });
 
   app.on('window-all-closed', () => {

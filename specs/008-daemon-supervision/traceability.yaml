@@ -6,11 +6,35 @@ acceptanceCriteria:
 tasks:
   - TASK-DAEMON-001
   - TASK-DAEMON-002
+  - TASK-DAEMON-003
 
 tests:
   - TEST-DAEMON-UNIT-001
   - TEST-DAEMON-UNIT-002
+  - TEST-DAEMON-UNIT-003
+  - TEST-DAEMON-UNIT-004
 
 implementation:
+  - apps/daemon/package.json
+  - apps/daemon/src/bootstrap/daemon-entrypoint.ts
+  - apps/desktop/src/main/app-lifecycle/register-app-lifecycle.ts
   - apps/desktop/src/main/daemon-supervisor/daemon-supervisor.ts
+  - apps/desktop/src/main/daemon-supervisor/create-desktop-daemon-supervisor.ts
+  - apps/desktop/src/main/daemon-supervisor/node-daemon-process.ts
   - apps/desktop/src/main/daemon-supervisor/restart-policy.ts
+  - apps/desktop/src/main/index.ts
+  - packages/adapters/filesystem/package.json
+  - packages/adapters/keychain/package.json
+  - packages/adapters/qwen/package.json
+  - packages/adapters/slack/package.json
+  - packages/adapters/sqlite/package.json
+  - packages/adapters/vector-store/package.json
+  - packages/board/package.json
+  - packages/contracts/package.json
+  - packages/drafting/package.json
+  - packages/hermes-harness/package.json
+  - packages/knowledge/package.json
+  - packages/observability/package.json
+  - packages/slack-sync/package.json
+  - packages/testkit/package.json
+  - vitest.config.ts
