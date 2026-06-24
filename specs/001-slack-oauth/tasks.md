@@ -79,3 +79,31 @@ Target spec:
 ### Verification
 
 - [x] Unit Test
+
+## TASK-OAUTH-004 Slack OAuth code exchange adapter
+
+Target spec:
+
+- FR-OAUTH-001
+- AC-OAUTH-001-03
+
+### Red
+
+- [x] Add `TEST-OAUTH-CONTRACT-004` and `TEST-OAUTH-CONTRACT-005`.
+- [x] Confirm there is no Slack OAuth code exchange adapter.
+
+### Green
+
+- [x] Add a Slack OAuth code exchange client in the Slack adapter package.
+- [x] Send Slack OAuth exchange inputs as form data.
+- [x] Validate Slack OAuth success and failure responses with Runtime Schema.
+- [x] Map successful Slack responses to daemon OAuth completion input.
+
+### Refactor
+
+- [x] Keep Slack HTTP response shapes inside `packages/adapters/slack`.
+
+### Verification
+
+- [x] Contract Test
+- [x] Quality
