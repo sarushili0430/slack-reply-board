@@ -71,6 +71,18 @@ jobs:
         working-directory: apps/desktop
         run: pnpm exec electron-forge package
 
+      - name: Wait for package output
+        run: |
+          for attempt in $(seq 1 30); do
+            if [ -d apps/desktop/out ] && [ -n "$(find apps/desktop/out -mindepth 1 -maxdepth 1 -print -quit)" ]; then
+              find apps/desktop/out -maxdepth 3 -print
+              exit 0
+            fi
+            sleep 1
+          done
+          find apps/desktop -maxdepth 3 -print
+          exit 1
+
       - name: Generate checksums
         run: >
           find apps/desktop/out -maxdepth 3 -type f -print0 |
