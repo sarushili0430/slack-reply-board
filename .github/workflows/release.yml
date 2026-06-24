@@ -72,17 +72,17 @@ jobs:
 
       - name: Generate checksums
         run: >
-          find apps/desktop/out -maxdepth 3 -type f -print0 |
-          xargs -0 shasum -a 256 > apps/desktop/out/SHA256SUMS.sha256
+          find out/desktop -maxdepth 3 -type f -print0 |
+          xargs -0 shasum -a 256 > out/desktop/SHA256SUMS.sha256
 
       - name: Attest artifacts
         uses: actions/attest-build-provenance@e8998f949152b193b063cb0ec769d69d929409be # v2.4.0
         with:
-          subject-path: apps/desktop/out/**
+          subject-path: out/desktop/**
 
       - name: Upload artifact
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: slack-reply-board-release-macos
-          path: apps/desktop/out
+          path: out/desktop
           if-no-files-found: error
