@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, test } from 'vitest';
+import { afterEach, describe, expect, test, vi } from 'vitest';
 
 import {
   createLocalApiSessionToken,
@@ -97,5 +97,37 @@ describe('FR-LOCAL-001 Local API session protection', () => {
 
     await runtime.stop();
     runtimes.pop();
+  });
+
+  test('TEST-LOCAL-INTEGRATION-004 AC-LOCAL-001-02: daemon startup uses the session token passed through environment', async () => {
+    const sessionToken = createLocalApiSessionToken({
+      randomBytes: () => Buffer.alloc(32, 6),
+    });
+    vi.stubEnv('REPLYBOARD_LOCAL_API_SESSION_TOKEN', sessionToken);
+
+    try {
+      const runtime = await startDaemon({
+        databasePath: ':memory:',
+        localApi: {
+          host: '127.0.0.1',
+          port: 0,
+        },
+      });
+      runtimes.push(runtime);
+
+      expect(runtime.localApi.sessionToken).toBe(sessionToken);
+
+      const healthPayload = await fetchDaemonHealth({
+        origin: runtime.localApi.origin,
+        sessionToken,
+      });
+
+      expect(healthPayload.status).toBe('ok');
+
+      await runtime.stop();
+      runtimes.pop();
+    } finally {
+      vi.unstubAllEnvs();
+    }
   });
 });
