@@ -2,7 +2,10 @@ import { access, readdir, readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
 const workflowText = await readFile('.github/workflows/release.yml', 'utf8');
+const packageWorkflowText = await readFile('.github/workflows/package.yml', 'utf8');
+const forgeConfigText = await readFile('apps/desktop/forge.config.ts', 'utf8');
 const errors = [];
+const packagingWorkflowText = `${packageWorkflowText}\n${workflowText}`;
 
 if (!/build-macos:[\s\S]*?environment:\s*release/u.test(workflowText)) {
   errors.push('release / macos must use the protected release environment');
@@ -19,15 +22,12 @@ if (!/tags:\s*\n\s*-\s*'v\*'/u.test(workflowText)) {
 const releaseWorkflowRequirements = [
   'APPLE_CERTIFICATE_BASE64',
   'APPLE_CERTIFICATE_PASSWORD',
+  'APPLE_ID',
+  'APPLE_ID_PASSWORD',
   'APPLE_SIGNING_IDENTITY',
+  'APPLE_TEAM_ID',
   'KEYCHAIN_PASSWORD',
   'security import',
-  '--osx-sign.identity',
-  '--osx-sign.hardenedRuntime=true',
-  '--osx-sign.entitlements=apps/desktop/build/entitlements.mac.plist',
-  '--osx-notarize.appleId',
-  '--osx-notarize.appleIdPassword',
-  '--osx-notarize.teamId',
   'shasum -a 256',
   'actions/attest-build-provenance',
   'actions/upload-artifact',
@@ -37,6 +37,33 @@ const releaseWorkflowRequirements = [
 for (const requiredText of releaseWorkflowRequirements) {
   if (!workflowText.includes(requiredText)) {
     errors.push(`release workflow is missing: ${requiredText}`);
+  }
+}
+
+if (!packagingWorkflowText.includes('pnpm --filter @replyboard/desktop package')) {
+  errors.push(
+    'package and release workflows must invoke Electron Forge through the desktop package script',
+  );
+}
+
+if (packagingWorkflowText.includes('electron-packager')) {
+  errors.push('package and release workflows must not call electron-packager directly');
+}
+
+const forgeConfigRequirements = [
+  "name: 'SlackReplyBoard'",
+  "appBundleId = 'com.sarushili0430.slack-reply-board'",
+  'osxSign',
+  'hardenedRuntime: true',
+  "join(projectDir, 'build/entitlements.mac.plist')",
+  'osxNotarize',
+  'appleIdPassword',
+  'teamId',
+];
+
+for (const requiredText of forgeConfigRequirements) {
+  if (!forgeConfigText.includes(requiredText)) {
+    errors.push(`Forge config is missing: ${requiredText}`);
   }
 }
 
