@@ -36,11 +36,12 @@ When:
 
 Then:
 
-- Automation launches the packaged `.app` with Playwright Electron.
-- The smoke verifies the reply board shell renders.
-- The smoke verifies the preload API can return the application version.
-- The smoke verifies Renderer Node globals remain unavailable.
+- Automation launches the packaged `.app` executable as a macOS process.
+- The packaged app starts the supervised daemon with a smoke daemon entrypoint.
+- The packaged app writes a package-smoke readiness marker after Electron lifecycle startup
+  finishes.
 - The smoke exits the application cleanly before artifact upload or release publication.
+- Renderer behavior remains covered by Electron E2E, not by the packaged app smoke attach path.
 
 ### AC-PACKAGE-001-03 Package workflows use the same explicit output directory
 

@@ -32,9 +32,10 @@ describe('FR-PACKAGE-001 Electron Forge packaging', () => {
   });
 
   test('TEST-PACKAGE-CONTRACT-002 AC-PACKAGE-001-02: workflows smoke test packaged macOS app before upload or release', async () => {
-    const [packageWorkflow, releaseWorkflow] = await Promise.all([
+    const [packageWorkflow, releaseWorkflow, smokeScript] = await Promise.all([
       readFile(packageWorkflowPath, 'utf8'),
       readFile(releaseWorkflowPath, 'utf8'),
+      readFile('scripts/smoke-macos-app.mjs', 'utf8'),
     ]);
 
     expect(packageWorkflow).toContain('pnpm package:smoke');
@@ -45,6 +46,11 @@ describe('FR-PACKAGE-001 Electron Forge packaging', () => {
     expect(releaseWorkflow.indexOf('pnpm package:smoke')).toBeLessThan(
       releaseWorkflow.indexOf('actions/upload-artifact@'),
     );
+    expect(smokeScript).toContain("import { spawn } from 'node:child_process'");
+    expect(smokeScript).not.toContain("from 'playwright'");
+    expect(smokeScript).toContain('REPLYBOARD_PACKAGE_SMOKE_READY_FILE');
+    expect(smokeScript).toContain('REPLYBOARD_PACKAGE_SMOKE_DAEMON_READY_FILE');
+    expect(smokeScript).toContain('REPLYBOARD_PACKAGE_SMOKE_QUIT_AFTER_READY');
   });
 
   test('TEST-PACKAGE-CONTRACT-003 AC-PACKAGE-001-03: workflows pass Forge an explicit output directory', async () => {
