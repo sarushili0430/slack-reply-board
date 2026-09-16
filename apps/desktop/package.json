@@ -28,6 +28,6 @@
     "react-dom": "19.2.7"
   },
   "devDependencies": {
-    "electron": "42.4.1"
+    "electron": "44.3.0"
   }
 }
